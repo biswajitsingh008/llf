@@ -1,16 +1,19 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=manifest href=manifest.json><meta name=theme-color content="#14181c"><title>LLF Checklist</title>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=manifest href=manifest.json><meta name=theme-color content="#0a0a0a"><title>LLF Checklist</title>
 <style>
-:root{--ink:#14181c;--bg:#e9ecee;--card:#fff;--acc:#0f5c8a;--bad:#c62828}
-body{margin:0;font:15px/1.35 system-ui,sans-serif;background:linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.35)),url(bg.jpg) center/cover no-repeat fixed #0b0b0b;color:var(--ink);min-height:100vh}
-header{background:rgba(10,10,10,.92);color:#fff;padding:10px 12px;position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;gap:8px}
+:root{--ink:#fff;--card:rgba(12,12,12,.52);--acc:#d4a017;--bad:#ff5252}
+body{margin:0;font:15px/1.35 system-ui,sans-serif;background:linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,.12)),url(bg.jpg) center/cover no-repeat fixed #0b0b0b;color:#fff;min-height:100vh;color-scheme:dark}
+header{background:rgba(10,10,10,.85);color:#fff;padding:10px 12px;position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;gap:8px}
 header b{font-size:17px}#st{font-size:12px;text-align:right}
-.bar,.card{background:var(--card);margin:8px;padding:10px;border-radius:6px;border-left:4px solid var(--acc)}
+.bar,.card{background:var(--card);margin:8px;padding:10px;border-radius:6px;border-left:4px solid var(--acc);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
 .bar{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bar .w{grid-column:1/3}
 .g{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:6px;margin:6px 0}
-label{font-size:12px;color:#4a5560;display:block}
-input,select,button{width:100%;box-sizing:border-box;padding:9px;font:inherit;border:1px solid #9aa5ae;border-radius:4px;background:#fff;color:var(--ink)}
-.bad{background:#ffdcdc;border-color:var(--bad)}.card.flag{border-left-color:var(--bad)}
-button{background:var(--acc);color:#fff;border:0;padding:14px;font-weight:600}
+label{font-size:12px;color:#f0d98a;display:block;text-shadow:0 1px 2px #000}
+.card>b{text-shadow:0 1px 2px #000}
+input,select,button{width:100%;box-sizing:border-box;padding:9px;font:inherit;border:1px solid #a89048;border-radius:4px;background:rgba(0,0,0,.45);color:#fff}
+option{background:#1b1b1b;color:#fff}
+::placeholder{color:#c9c0a0}
+.bad{background:rgba(220,40,40,.6)!important;border-color:var(--bad)}.card.flag{border-left-color:var(--bad)}
+button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 </style></head><body>
 <header><b>LLF Checklist</b><span id=st></span></header>
 <div class=bar>
@@ -26,7 +29,7 @@ button{background:var(--acc);color:#fff;border:0;padding:14px;font-weight:600}
 <script>
 const API='https://script.google.com/macros/s/AKfycbzyTGkosf9BgOGX5nRov3_7Yfov3-gVSClyiscFr_wad-uXjHU4QXuc9of_zKC_utYX/exec',$=s=>document.querySelector(s),LS=localStorage,H=['loc','shift','date','by','mail','code'];
 let M=JSON.parse(LS.master||'[]'),D=JSON.parse(LS.draft||'{"h":{},"v":{}}');
-const bad=(el)=>{const v=el.value;return el.dataset.m?+v>+el.dataset.m:/^Not OK$|Rattling|humming|Whistling|Squealing/.test(v)};
+const bad=(el)=>{const v=el.value;return el.dataset.m?+v>+el.dataset.m:/^(Not OK|Yes)$|Rattling|humming|Whistling|Squealing/.test(v)};
 function mark(el){el.classList.toggle('bad',!!el.value&&bad(el));const c=el.closest('.card');if(c)c.classList.toggle('flag',!!c.querySelector('.bad'))}
 function render(){
  const loc=$('#loc').value,g={};
