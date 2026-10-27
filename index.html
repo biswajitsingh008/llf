@@ -1,4 +1,4 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=manifest href=manifest.json><meta name=theme-color content="#0a0a0a"><title>LLF Checklist</title>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=manifest href=manifest.json><link rel=apple-touch-icon href=icon-192.png><meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-title content=LLF><meta name=apple-mobile-web-app-status-bar-style content=black><meta name=theme-color content="#0a0a0a"><title>LLF Checklist</title>
 <style>
 :root{--ink:#fff;--card:rgba(12,12,12,.52);--acc:#d4a017;--bad:#ff5252}
 body{margin:0;font:15px/1.35 system-ui,sans-serif;background:linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,.12)),url(bg.jpg) center/cover no-repeat fixed #0b0b0b;color:#fff;min-height:100vh;color-scheme:dark}
@@ -20,15 +20,15 @@ button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 <div><label>Location</label><select id=loc></select></div>
 <div><label>Shift</label><select id=shift><option>A<option>B<option>C</select></div>
 <div><label>Date</label><input id=date type=date></div>
-<div><label>Checked by</label><input id=by></div>
-<div><label>Your email (gets PDF)</label><input id=mail type=email></div>
+<div><label>Checked by</label><select id=by></select></div>
+<div><label>Email (gets PDF)</label><input id=mail type=email readonly></div>
 <div><label>Access code</label><input id=code type=password></div>
 </div>
 <div id=f></div>
 <div class=bar><button id=go class=w>Submit checklist</button></div>
 <script>
 const API='https://script.google.com/macros/s/AKfycbzyTGkosf9BgOGX5nRov3_7Yfov3-gVSClyiscFr_wad-uXjHU4QXuc9of_zKC_utYX/exec',$=s=>document.querySelector(s),LS=localStorage,H=['loc','shift','date','by','mail','code'];
-let M=JSON.parse(LS.master||'[]'),D=JSON.parse(LS.draft||'{"h":{},"v":{}}');
+let M=JSON.parse(LS.master||'[]'),E=JSON.parse(LS.emp||'[]'),D=JSON.parse(LS.draft||'{"h":{},"v":{}}');
 const bad=(el)=>{const v=el.value;return el.dataset.m?+v>+el.dataset.m:/^(Not OK|Yes)$|Rattling|humming|Whistling|Squealing/.test(v)};
 function mark(el){el.classList.toggle('bad',!!el.value&&bad(el));const c=el.closest('.card');if(c)c.classList.toggle('flag',!!c.querySelector('.bad'))}
 function render(){
@@ -38,12 +38,14 @@ function render(){
   return `<div><label>${r[2]}${r[4]?' ('+r[4]+')':''}${num?' max '+r[5]:''}</label>`+(num?`<input type=number step=any inputmode=decimal data-k="${k}" data-m="${r[5]}" value="${v}">`:`<select data-k="${k}"><option value="">`+r[5].split('|').map(o=>`<option${o==v?' selected':''}>${o}`).join('')+'</select>')+'</div>'}).join('')+`</div><input data-k="${e}|Remark" placeholder="Any abnormality found (required if red)" value="${D.v[e+'|Remark']??''}"></div>`).join('');
  document.querySelectorAll('[data-m],select[data-k]').forEach(mark);
 }
+function setMail(){const x=E.find(r=>r[0]==$('#by').value);$('#mail').value=x?x[1]:''}
 function save(){H.forEach(i=>D.h[i]=$('#'+i).value);D.v={};document.querySelectorAll('[data-k]').forEach(i=>i.value&&(D.v[i.dataset.k]=i.value));LS.draft=JSON.stringify(D);$('#st').textContent='Draft saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
 function init(){
  $('#loc').innerHTML=[...new Set(M.map(r=>r[0]))].map(l=>`<option>${l}`).join('');
- H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i])); if(!$('#date').value)$('#date').valueAsDate=new Date(); render();
+ $('#by').innerHTML='<option value="">Select name'+E.map(r=>`<option>${r[0]}`).join('');
+ H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); if(!$('#date').value)$('#date').valueAsDate=new Date(); render();
 }
-document.addEventListener('input',e=>{if(e.target.id=='loc'){D.v={};render()}if(e.target.dataset.k)mark(e.target);save()});
+document.addEventListener('input',e=>{if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};render()}if(e.target.dataset.k)mark(e.target);save()});
 $('#go').onclick=()=>{
  save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.lastElementChild.value);
  if(!H.slice(0,4).every(i=>D.h[i])||!D.h.code)return alert('Fill location, shift, date, name and access code.');
@@ -57,7 +59,7 @@ async function sync(){
  while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg='Not sent: '+e;break}}
  $('#st').textContent=msg||(Q.length?Q.length+' waiting for signal':'All sent')
 }
-(async()=>{try{M=await(await fetch(API)).json();LS.master=JSON.stringify(M)}catch(e){}init();sync()})();
+(async()=>{try{const r=await(await fetch(API)).json();M=Array.isArray(r)?r:r.m;if(r.e&&r.e.length)E=r.e;LS.master=JSON.stringify(M);LS.emp=JSON.stringify(E)}catch(e){}init();sync()})();
 addEventListener('online',sync);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
 </script></body></html>
