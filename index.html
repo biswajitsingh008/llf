@@ -15,6 +15,7 @@ option{background:#1b1b1b;color:#fff}
 ::placeholder{color:#c9c0a0}
 .bad{background:rgba(220,40,40,.6)!important;border-color:var(--bad)}.card.flag{border-left-color:var(--bad)}
 button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
+.off{opacity:.35}input:disabled,select:disabled{cursor:not-allowed}
 .miss{background:rgba(57,255,20,.55)!important;border-color:#39ff14!important;box-shadow:0 0 8px #39ff14}
 #msg{display:none;background:#161616;color:#fff;border:2px solid var(--acc);border-radius:8px;padding:14px;font-size:16px;font-weight:600;text-align:center}
 </style></head><body>
@@ -39,8 +40,15 @@ function render(){
  const loc=$('#loc').value,g={};
  M.filter(r=>r[0]==loc).forEach(r=>(g[r[1]]=g[r[1]]||[]).push(r));
  $('#f').innerHTML=Object.entries(g).map(([e,fs])=>`<div class=card><b>${e}</b><div class=g>`+fs.map(r=>{const k=e+'|'+r[2],v=D.v[k]??'',num=r[3]=='num',R=num?rng(r[5]):null;
-  return `<div><label>${r[2]}${r[4]?' ('+r[4]+')':''}${R?' OP '+(R[0]==-Infinity?'max '+R[1]:R[0]+'-'+R[1]):''}</label>`+(num?`<input type=number step=any inputmode=decimal data-k="${k}"${R?` data-lo="${R[0]}" data-hi="${R[1]}"`:''} value="${v}">`:`<select data-k="${k}"><option value="">`+r[5].split('|').map(o=>`<option${o==v?' selected':''}>${o}`).join('')+'</select>')+'</div>'}).join('')+`</div><input data-k="${e}|Remark" placeholder="Any abnormality found (required if red)" value="${D.v[e+'|Remark']??''}"></div>`).join('');
+  return `<div><label>${r[2]}${r[4]?' ('+r[4]+')':''}${R?' OP '+(R[0]==-Infinity?'max '+R[1]:R[0]+'-'+R[1]):''}</label>`+(num?`<input type=number step=any inputmode=decimal data-k="${k}"${R?` data-lo="${R[0]}" data-hi="${R[1]}"`:''} value="${v}">`:`<select data-k="${k}"${r[5]=='Running|Standby'?' data-st=1':''}><option value="">`+r[5].split('|').map(o=>`<option${o==v?' selected':''}>${o}`).join('')+'</select>')+'</div>'}).join('')+`</div><input data-k="${e}|Remark" placeholder="Any abnormality found (required if red)" value="${D.v[e+'|Remark']??''}"></div>`).join('');
+ document.querySelectorAll('[data-st]').forEach(applyStatus);
  document.querySelectorAll('[data-lo],select[data-k]').forEach(mark);
+}
+function applyStatus(s){ // Standby: this machine's readings are greyed out, locked and cleared (they are not required)
+ const off=s.value=='Standby',pre=s.dataset.k.split('|')[1].replace(/Status$/,'');
+ s.closest('.card').querySelectorAll('[data-k]').forEach(i=>{const f=i.dataset.k.split('|')[1];
+  if(i===s||f=='Remark'||i.dataset.st!==undefined||!f.startsWith(pre))return;
+  i.disabled=off;if(off)i.value='';i.closest('div').classList.toggle('off',off);mark(i)})
 }
 function setMail(){const x=E.find(r=>r[0]==$('#by').value);$('#mail').value=x?x[1]:''}
 function save(){H.forEach(i=>D.h[i]=$('#'+i).value);D.v={};document.querySelectorAll('[data-k]').forEach(i=>i.value&&(D.v[i.dataset.k]=i.value));LS.draft=JSON.stringify(D);$('#st').textContent='Draft saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
@@ -49,9 +57,9 @@ function init(){
  $('#by').innerHTML='<option value="">Select name'+E.map(r=>`<option>${r[0]}`).join('');
  H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); if(!$('#date').value)$('#date').valueAsDate=new Date(); render();
 }
-document.addEventListener('input',e=>{if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};render()}if(e.target.dataset.k)mark(e.target);save()});
+document.addEventListener('input',e=>{if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k)mark(e.target);save()});
 $('#go').onclick=()=>{
- save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.lastElementChild.value);
+ save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.disabled&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.lastElementChild.value);
  if(!H.slice(0,4).every(i=>D.h[i])||!D.h.code)return alert('Fill location, shift, date, name and access code.');
  if(miss.length){miss.forEach(i=>i.classList.add('miss'));return note('Fill all readings then press Submit checklist')}
  if(noR.length){noR[0].scrollIntoView({block:'center'});noR[0].lastElementChild.focus();return alert('Write the abnormality remark for items marked red.')}
