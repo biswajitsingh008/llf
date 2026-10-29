@@ -17,9 +17,15 @@ option{background:#1b1b1b;color:#fff}
 button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 .off{opacity:.35}input:disabled,select:disabled{cursor:not-allowed}
 .miss{background:rgba(57,255,20,.55)!important;border-color:#39ff14!important;box-shadow:0 0 8px #39ff14}
-#msg{display:none;background:#161616;color:#fff;border:2px solid var(--acc);border-radius:8px;padding:14px;font-size:16px;font-weight:600;text-align:center}
+#msg,#wmsg{display:none;background:#161616;color:#fff;border:2px solid var(--acc);border-radius:8px;padding:14px;font-size:16px;font-weight:600;text-align:center}
+#tabs{display:flex;gap:6px;margin:8px}
+#tabs button{padding:11px 4px;background:rgba(0,0,0,.6);color:#f0d98a;border:1px solid #a89048;font-weight:600}
+#tabs button.on{background:var(--acc);color:#111;border-color:var(--acc)}
+.item{cursor:pointer}.rp table{width:100%;border-collapse:collapse;font-size:13px}.rp td{padding:4px;border-top:1px solid rgba(255,255,255,.18)}.rp tr.f td{background:rgba(220,40,40,.55)}
 </style></head><body>
 <header><b>LLF Checklist</b><span id=st></span></header>
+<div id=tabs><button data-t=chk class=on>Checklist</button><button data-t=ver>Verify</button><button data-t=app>Approval</button></div>
+<div id=chk>
 <div class=bar>
 <div><label>Location</label><select id=loc></select></div>
 <div><label>Shift</label><select id=shift><option>A<option>B<option>C</select></div>
@@ -30,9 +36,18 @@ button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 </div>
 <div id=f></div>
 <div class=bar><div id=msg class=w></div><button id=go class=w>Submit checklist</button></div>
+</div>
+<div id=wf style="display:none">
+<div class=bar><div class=w><b id=wt style="font-size:17px"></b><div id=wd style="font-size:12px;color:#f0d98a"></div></div>
+<div><label>Your name</label><select id=wn></select></div>
+<div><label>Access code</label><input id=wc type=password></div>
+<button id=wl class=w>Show reports waiting</button></div>
+<div id=wmsg style="margin:8px"></div>
+<div id=wlist></div><div id=wrep></div>
+</div>
 <script>
 const API='https://script.google.com/macros/s/AKfycbzyTGkosf9BgOGX5nRov3_7Yfov3-gVSClyiscFr_wad-uXjHU4QXuc9of_zKC_utYX/exec',$=s=>document.querySelector(s),LS=localStorage,H=['loc','shift','date','by','mail','code'];
-let M=JSON.parse(LS.master||'[]'),E=JSON.parse(LS.emp||'[]'),D=JSON.parse(LS.draft||'{"h":{},"v":{}}');
+let VN=JSON.parse(LS.vn||'[]'),AN=JSON.parse(LS.an||'[]'),WS='',M=JSON.parse(LS.master||'[]'),E=JSON.parse(LS.emp||'[]'),D=JSON.parse(LS.draft||'{"h":{},"v":{}}');
 const rng=t=>{const m=String(t).replace(/[\u2013\u2014]/g,'-').match(/^\s*(-?\d+(?:\.\d+)?)\s*-\s*(-?\d+(?:\.\d+)?)\s*$/);return m?[+m[1],+m[2]]:(isNaN(+t)||t===''?null:[-Infinity,+t])};
 const bad=(el)=>{const v=el.value;if(el.dataset.lo!==undefined)return +v<+el.dataset.lo||+v>+el.dataset.hi;return /^(Not OK|Yes)$|Rattling|humming|Whistling|Squealing/.test(v)};
 function mark(el){el.classList.toggle('bad',!!el.value&&bad(el));const c=el.closest('.card');if(c)c.classList.toggle('flag',!!c.querySelector('.bad'))}
@@ -57,7 +72,7 @@ function init(){
  $('#by').innerHTML='<option value="">Select name'+E.map(r=>`<option>${r[0]}`).join('');
  H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); if(!$('#date').value)$('#date').valueAsDate=new Date(); render();
 }
-document.addEventListener('input',e=>{if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k)mark(e.target);save()});
+document.addEventListener('input',e=>{if(e.target.closest('#wf'))return;if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k)mark(e.target);save()});
 $('#go').onclick=()=>{
  save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.disabled&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.lastElementChild.value);
  if(!H.slice(0,4).every(i=>D.h[i])||!D.h.code)return alert('Fill location, shift, date, name and access code.');
@@ -74,7 +89,48 @@ async function sync(){
  while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg='Not sent: '+e;break}}
  $('#st').textContent=msg||(Q.length?Q.length+' waiting for signal':'All sent')
 }
-(async()=>{try{const r=await(await fetch(API)).json();M=Array.isArray(r)?r:r.m;if(r.e&&r.e.length)E=r.e;LS.master=JSON.stringify(M);LS.emp=JSON.stringify(E)}catch(e){}init();sync()})();
+(async()=>{try{const r=await(await fetch(API)).json();M=Array.isArray(r)?r:r.m;if(r.e&&r.e.length)E=r.e;if(r.v)VN=r.v;if(r.a)AN=r.a;LS.master=JSON.stringify(M);LS.emp=JSON.stringify(E);LS.vn=JSON.stringify(VN);LS.an=JSON.stringify(AN)}catch(e){}init();sync()})();
+// ---- Verify / Approval tabs (need internet)
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function wmsg(t){const m=$('#wmsg');m.textContent=t;m.style.display=t?'block':'none'}
+function tab(t){
+ $('#chk').style.display=t=='chk'?'':'none';$('#wf').style.display=t=='chk'?'none':'block';
+ document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));
+ if(t=='chk')return;
+ WS=t=='ver'?'verify':'approve';const L=t=='ver'?VN:AN;
+ $('#wt').textContent=t=='ver'?'Verify reports':'Approval (UAIL)';
+ $('#wd').textContent=t=='ver'?'Read the checklist, then verify it with your name.':'Read the verified checklist, then approve it with your name.';
+ $('#wn').innerHTML='<option value="">Select your name'+L.map(n=>`<option>${esc(n)}`).join('');
+ try{const s=LS['wn_'+WS];if(s&&L.includes(s))$('#wn').value=s}catch(e){}
+ $('#wlist').innerHTML='';$('#wrep').innerHTML='';wmsg(L.length?'':'No names are listed yet. Add them in the '+(t=='ver'?'Verifiers':'Approvers')+' tab of the Google Sheet.')
+}
+$('#tabs').onclick=e=>{const t=e.target.dataset.t;if(t)tab(t)};
+async function api(o){try{const r=await fetch(API,{method:'POST',body:JSON.stringify({stage:WS,code:$('#wc').value,...o})});return await r.json()}catch(e){return{ok:false,err:'No signal. This step needs internet.'}}}
+async function wlist(){
+ $('#wrep').innerHTML='';wmsg('Loading...');
+ const r=await api({action:'list'});if(!r.ok){$('#wlist').innerHTML='';return wmsg(r.err)}
+ wmsg(r.items.length?'':'No reports are waiting for this step.');
+ $('#wlist').innerHTML=r.items.map(x=>`<div class="card item" data-id="${esc(x.id)}"><b>${esc(x.loc)} &middot; ${esc(x.date)} &middot; Shift ${esc(x.shift)}</b><div style="font-size:13px">Checked by ${esc(x.by)}${x.ver?' &middot; Verified by '+esc(x.ver):''}</div><div style="font-size:12px;color:${x.flags?'#ff8a8a':'#8fe3a0'}">${x.flags?x.flags+' reading(s) out of range / abnormal':'All readings normal'}</div></div>`).join('')
+}
+$('#wl').onclick=wlist;
+$('#wlist').onclick=e=>{const c=e.target.closest('.item');if(c)wopen(c.dataset.id)};
+async function wopen(id){
+ wmsg('Loading report...');const r=await api({action:'get',id});if(!r.ok)return wmsg(r.err);wmsg('');
+ const m=r.meta,g={},rem={};r.rows.forEach(x=>{if(x[1]=='Remark')rem[x[0]]=x[2];else(g[x[0]]=g[x[0]]||[]).push(x)});
+ $('#wlist').innerHTML='';
+ $('#wrep').innerHTML=`<div class=bar><div class=w><b style="font-size:17px">${esc(m.loc)} &middot; ${esc(m.date)} &middot; Shift ${esc(m.shift)}</b><div style="font-size:13px">Checked by ${esc(m.by)}${m.ver?' &middot; Verified by '+esc(m.ver)+' ('+esc(m.verAt)+')':''}</div></div></div>`
+ +Object.entries(g).map(([e,fs])=>`<div class="card rp"><b>${esc(e)}</b><table>`+fs.map(x=>`<tr class="${x[4]?'f':''}"><td>${esc(x[1])}</td><td><b>${esc(x[2])}</b> ${esc(x[5])}</td><td>${x[3]?'OP '+esc(String(x[3]).replace(/\s*-\s*/,'-')):''}</td><td>${esc(x[4])}</td></tr>`).join('')+`</table>${rem[e]?'<div style="color:#ff8a8a;margin-top:4px"><b>Remark:</b> '+esc(rem[e])+'</div>':''}</div>`).join('')
+ +`<div class=bar><button id=wback class=w style="background:#444;color:#fff">Back to list</button><button id=wsign class=w>I have read this report - ${WS=='verify'?'Verify':'Approve'}</button></div>`;
+ window.scrollTo(0,0);
+ $('#wback').onclick=wlist;
+ $('#wsign').onclick=async()=>{
+  const name=$('#wn').value;if(!name){window.scrollTo(0,0);return wmsg('Select your name first')}
+  if(!confirm((WS=='verify'?'Verify':'Approve')+' this report as '+name+'?'))return;
+  const s=await api({action:'sign',id,name});if(!s.ok){window.scrollTo(0,0);return wmsg(s.err)}
+  try{LS['wn_'+WS]=name}catch(e){}
+  await wlist();wmsg('Done. Report '+(WS=='verify'?'verified':'approved')+' by '+name+'.'+(s.warn?' '+s.warn:''));window.scrollTo(0,0)
+ }
+}
 addEventListener('online',sync);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
 </script></body></html>
