@@ -1,7 +1,7 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><link rel=manifest href=manifest.json><link rel=apple-touch-icon href=icon-192.png><meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-title content=LLF><meta name=apple-mobile-web-app-status-bar-style content=black><meta name=theme-color content="#0a0a0a"><title>LLF Checklist</title>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,interactive-widget=resizes-content"><link rel=manifest href=manifest.json><link rel=apple-touch-icon href=icon-192.png><meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-title content=LLF><meta name=apple-mobile-web-app-status-bar-style content=black><meta name=theme-color content="#0a0a0a"><title>LLF Checklist</title>
 <style>
 :root{--ink:#fff;--card:rgba(12,12,12,.52);--acc:#d4a017;--bad:#ff5252}
-body{margin:0;font:15px/1.35 system-ui,sans-serif;background:linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,.12)),url(bg.jpg) center/cover no-repeat fixed #0b0b0b;color:#fff;min-height:100vh;color-scheme:dark}
+body{overscroll-behavior-y:contain;margin:0;font:15px/1.35 system-ui,sans-serif;background:linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,.12)),url(bg.jpg) center/cover no-repeat fixed #0b0b0b;color:#fff;min-height:100vh;color-scheme:dark}
 header{background:rgba(10,10,10,.85);color:#fff;padding:10px 12px;position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;gap:8px}
 header b{font-size:17px}#st{font-size:12px;text-align:right}
 .bar,.card{background:var(--card);margin:8px;padding:10px;border-radius:6px;border-left:4px solid var(--acc);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
@@ -150,11 +150,12 @@ async function sync(){
 // draw the checklist at once from the copy saved on this phone, then refresh it quietly in the background
 if(M.length)init();else $('#f').innerHTML='<div class=card><b>Loading checklist...</b><div style="font-size:12px;color:#f0d98a">The first time, this needs signal and can take a few seconds.</div></div>';
 sync();
-(async()=>{try{const r=await(await fetch(API)).json(),nm=Array.isArray(r)?r:r.m,ne=r.e&&r.e.length?r.e:E;
+async function loadData(manual){try{const r=await(await fetch(API)).json(),nm=Array.isArray(r)?r:r.m,ne=r.e&&r.e.length?r.e:E;
  const changed=!M.length||JSON.stringify(nm)!=JSON.stringify(M)||JSON.stringify(ne)!=JSON.stringify(E)||JSON.stringify(r.l||{})!=JSON.stringify(LAST);
  if(changed&&M.length)save(); // keep anything already typed
  M=nm;E=ne;if(r.l){LAST=r.l;LS.last=JSON.stringify(LAST)}if(r.v)VN=r.v;if(r.a)AN=r.a;LS.master=JSON.stringify(M);LS.emp=JSON.stringify(E);LS.vn=JSON.stringify(VN);LS.an=JSON.stringify(AN);
- if(changed)init()}catch(e){if(!M.length)$('#f').innerHTML='<div class=card><b>Could not load the checklist.</b><div>Check the signal and reopen the app.</div></div>'}})();
+ if(changed)init();if(manual)$('#st').textContent='Data refreshed '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}catch(e){if(manual)$('#st').textContent='No signal: could not refresh';if(!M.length)$('#f').innerHTML='<div class=card><b>Could not load the checklist.</b><div>Check the signal and reopen the app.</div></div>'}}
+loadData();
 // ---- Verify / Approval tabs (need internet)
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function loadFix(r){ // puts the returned report back into the checklist form for correction
@@ -264,6 +265,17 @@ function drawBars(r,loc){
   hit.addEventListener('pointermove',sh);hit.addEventListener('pointerdown',sh);hit.addEventListener('pointerleave',()=>{tip.style.display='none';g.setAttribute('fill-opacity',1)})});
  c.append(svg,tip);table(c,['Item','Times flagged'],T.map(([k,n])=>[k,n]));
 }
+// ---- phone details: pull down to refresh, back button, keyboard
+let py=null;
+document.addEventListener('touchstart',e=>{py=window.scrollY<=0&&$('#chk').style.display!='none'?e.touches[0].clientY:null},{passive:true});
+document.addEventListener('touchend',e=>{if(py!==null&&e.changedTouches[0].clientY-py>120){$('#st').textContent='Refreshing...';loadData(true)}py=null},{passive:true});
+history.pushState({llf:1},'');
+addEventListener('popstate',()=>{ // Android back button: first closes an open report or goes back to the checklist; leaving a half-filled checklist asks first
+ if($('#chk').style.display=='none'){if($('#wback'))$('#wback').click();else tab('chk');history.pushState({llf:1},'');return}
+ if(Object.keys(D.v).length&&!confirm('This checklist is not submitted yet. Your draft is saved on this phone.\n\nLeave the app?')){history.pushState({llf:1},'');return}
+ history.back();
+});
+document.addEventListener('focusin',e=>{const t=e.target;if(t.matches&&t.matches('input,select,textarea'))setTimeout(()=>{try{t.scrollIntoView({block:'center',behavior:'smooth'})}catch(x){}},300)}); // keeps the box you are typing in above the keyboard
 addEventListener('online',sync);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
 </script></body></html>
