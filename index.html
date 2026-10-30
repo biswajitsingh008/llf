@@ -32,7 +32,7 @@ button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 <div><label>Date</label><input id=date type=date></div>
 <div><label>Checked by</label><select id=by></select></div>
 <div><label>Email (gets PDF)</label><input id=mail type=email readonly></div>
-<div><label>Access code</label><input id=code type=password></div>
+<div><label>Your personal code</label><input id=code type=password autocomplete=off></div>
 </div>
 <div id=f></div>
 <div class=bar><div id=msg class=w></div><button id=go class=w>Submit checklist</button></div>
@@ -40,7 +40,7 @@ button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 <div id=wf style="display:none">
 <div class=bar><div class=w><b id=wt style="font-size:17px"></b><div id=wd style="font-size:12px;color:#f0d98a"></div></div>
 <div><label>Your name</label><select id=wn></select></div>
-<div><label>Access code</label><input id=wc type=password></div>
+<div><label>Your personal code</label><input id=wc type=password autocomplete=off></div>
 <button id=wl class=w>Show reports waiting</button></div>
 <div id=wmsg style="margin:8px"></div>
 <div id=wlist></div><div id=wrep></div>
@@ -66,19 +66,20 @@ function applyStatus(s){ // Standby: this machine's readings are greyed out, loc
   i.disabled=off;if(off)i.value='';i.closest('div').classList.toggle('off',off);mark(i)})
 }
 function setMail(){const x=E.find(r=>r[0]==$('#by').value);$('#mail').value=x?x[1]:''}
-function save(){H.forEach(i=>D.h[i]=$('#'+i).value);D.v={};document.querySelectorAll('[data-k]').forEach(i=>i.value&&(D.v[i.dataset.k]=i.value));LS.draft=JSON.stringify(D);$('#st').textContent='Draft saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+function save(){H.forEach(i=>{if(i!='code')D.h[i]=$('#'+i).value});delete D.h.code; // the personal code is never stored in the draft
+ D.v={};document.querySelectorAll('[data-k]').forEach(i=>i.value&&(D.v[i.dataset.k]=i.value));LS.draft=JSON.stringify(D);$('#st').textContent='Draft saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
 function init(){
  $('#loc').innerHTML=[...new Set(M.map(r=>r[0]))].map(l=>`<option>${l}`).join('');
  $('#by').innerHTML='<option value="">Select name'+E.map(r=>`<option>${r[0]}`).join('');
- H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); if(!$('#date').value)$('#date').valueAsDate=new Date(); render();
+ delete D.h.code;H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); if(!$('#date').value)$('#date').valueAsDate=new Date(); render();
 }
 document.addEventListener('input',e=>{if(e.target.closest('#wf'))return;if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k)mark(e.target);save()});
 $('#go').onclick=()=>{
  save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.disabled&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.lastElementChild.value);
- if(!H.slice(0,4).every(i=>D.h[i])||!D.h.code)return alert('Fill location, shift, date, name and access code.');
+ if(!H.slice(0,4).every(i=>D.h[i])||!$('#code').value)return alert('Fill location, shift, date, name and your personal code.');
  if(miss.length){miss.forEach(i=>i.classList.add('miss'));return note('Fill all readings then press Submit checklist')}
  if(noR.length){noR[0].scrollIntoView({block:'center'});noR[0].lastElementChild.focus();return alert('Write the abnormality remark for items marked red.')}
- const Q=JSON.parse(LS.queue||'[]');Q.push({id:crypto.randomUUID(),...D.h,vals:D.v});LS.queue=JSON.stringify(Q);
+ const Q=JSON.parse(LS.queue||'[]');Q.push({id:crypto.randomUUID(),...D.h,code:$('#code').value,vals:D.v});LS.queue=JSON.stringify(Q);$('#code').value='';
  D.v={};LS.draft=JSON.stringify(D);render();sync();note('Please wait until top right corner says All sent');
 };
 let T=0;
@@ -86,7 +87,7 @@ function note(t){const m=$('#msg');m.textContent=t;m.style.display='block';m.scr
 document.addEventListener('click',()=>{if(Date.now()-T>400){$('#msg').style.display='none';document.querySelectorAll('.miss').forEach(i=>i.classList.remove('miss'))}}); // any tap on the screen closes the message (the 400 ms guard stops the Submit tap itself from closing it)
 async function sync(){
  let Q=JSON.parse(LS.queue||'[]'),msg='';
- while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg='Not sent: '+e;break}}
+ while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok&&r.auth&&!Object.keys(D.v).length){const it=Q.shift();LS.queue=JSON.stringify(Q);msg='Not sent: wrong code';D.h={loc:it.loc,shift:it.shift,date:it.date,by:it.by,mail:it.mail};D.v=it.vals;LS.draft=JSON.stringify(D);init();alert(r.err+'. Your checklist is back on the screen: enter the right code and submit again.');break}if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg='Not sent: '+e;break}}
  $('#st').textContent=msg||(Q.length?Q.length+' waiting for signal':'All sent')
 }
 (async()=>{try{const r=await(await fetch(API)).json();M=Array.isArray(r)?r:r.m;if(r.e&&r.e.length)E=r.e;if(r.v)VN=r.v;if(r.a)AN=r.a;LS.master=JSON.stringify(M);LS.emp=JSON.stringify(E);LS.vn=JSON.stringify(VN);LS.an=JSON.stringify(AN)}catch(e){}init();sync()})();
@@ -105,8 +106,9 @@ function tab(t){
  $('#wlist').innerHTML='';$('#wrep').innerHTML='';wmsg(L.length?'':'No names are listed yet. Add them in the '+(t=='ver'?'Verifiers':'Approvers')+' tab of the Google Sheet.')
 }
 $('#tabs').onclick=e=>{const t=e.target.dataset.t;if(t)tab(t)};
-async function api(o){try{const r=await fetch(API,{method:'POST',body:JSON.stringify({stage:WS,code:$('#wc').value,...o})});return await r.json()}catch(e){return{ok:false,err:'No signal. This step needs internet.'}}}
+async function api(o){try{const r=await fetch(API,{method:'POST',body:JSON.stringify({stage:WS,code:$('#wc').value,name:$('#wn').value,...o})});return await r.json()}catch(e){return{ok:false,err:'No signal. This step needs internet.'}}}
 async function wlist(){
+ if(!$('#wn').value)return wmsg('Select your name first');
  $('#wrep').innerHTML='';wmsg('Loading...');
  const r=await api({action:'list'});if(!r.ok){$('#wlist').innerHTML='';return wmsg(r.err)}
  wmsg(r.items.length?'':'No reports are waiting for this step.');
@@ -126,7 +128,7 @@ async function wopen(id){
  $('#wsign').onclick=async()=>{
   const name=$('#wn').value;if(!name){window.scrollTo(0,0);return wmsg('Select your name first')}
   if(!confirm((WS=='verify'?'Verify':'Approve')+' this report as '+name+'?'))return;
-  const s=await api({action:'sign',id,name});if(!s.ok){window.scrollTo(0,0);return wmsg(s.err)}
+  const s=await api({action:'sign',id});if(!s.ok){window.scrollTo(0,0);return wmsg(s.err)}
   try{LS['wn_'+WS]=name}catch(e){}
   await wlist();wmsg('Done. Report '+(WS=='verify'?'verified':'approved')+' by '+name+'.'+(s.warn?' '+s.warn:''));window.scrollTo(0,0)
  }
