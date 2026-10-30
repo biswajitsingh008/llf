@@ -19,12 +19,21 @@ button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 .miss{background:rgba(57,255,20,.55)!important;border-color:#39ff14!important;box-shadow:0 0 8px #39ff14}
 #msg,#wmsg{display:none;background:#161616;color:#fff;border:2px solid var(--acc);border-radius:8px;padding:14px;font-size:16px;font-weight:600;text-align:center}
 #tabs{display:flex;gap:6px;margin:8px}
-#tabs button{padding:11px 4px;background:rgba(0,0,0,.6);color:#f0d98a;border:1px solid #a89048;font-weight:600}
+#tabs{gap:4px}#tabs button{padding:11px 2px;font-size:13px;background:rgba(0,0,0,.6);color:#f0d98a;border:1px solid #a89048;font-weight:600}
 #tabs button.on{background:var(--acc);color:#111;border-color:var(--acc)}
 .item{cursor:pointer}.rp table{width:100%;border-collapse:collapse;font-size:13px}.rp td{padding:4px;border-top:1px solid rgba(255,255,255,.18)}.rp tr.f td{background:rgba(220,40,40,.55)}
+.ph{display:inline-block;margin:8px 8px 0 0;cursor:pointer}.ph span{display:inline-block;padding:8px 12px;border:1px solid #a89048;border-radius:4px;background:rgba(0,0,0,.45);font-size:13px}
+.pt img{height:44px;border-radius:4px;vertical-align:middle;margin-right:6px}.pt a{color:#f0d98a;font-size:12px}
+#msg .r{display:flex;gap:8px;margin-top:10px}
+#rb{display:none;color:#ffd27a}
+.viz{--s1:#1a1a19;--tp:#f0efec;--ts:#c3c2b7;--mu:#898781;--gr:#2c2c2a;--ba:#383835;--c1:#3987e5;--bad:#d03b3b;background:var(--s1);color:var(--tp);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;margin:8px;position:relative}
+.viz h3{margin:0;font-size:15px;font-weight:600}.viz .sub{font-size:12px;color:var(--ts);margin:2px 0 8px}
+.viz svg{display:block;width:100%;touch-action:pan-y}.viz text{fill:var(--mu);font-size:11px;font-family:inherit}.viz text.v{fill:var(--tp);font-weight:600;paint-order:stroke;stroke:var(--s1);stroke-width:3px}.viz text.l{fill:var(--ts)}
+.viz details{margin-top:8px;font-size:12px;color:var(--ts)}.viz summary{cursor:pointer;padding:6px 0}.viz table{width:100%;border-collapse:collapse}.viz td,.viz th{padding:3px 4px;border-top:1px solid var(--gr);text-align:left}.viz td.b{color:#ff8a8a;font-weight:600}
+.tip{position:absolute;display:none;pointer-events:none;background:#0b0b0b;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:6px 8px;font-size:12px;color:var(--ts);z-index:3;white-space:nowrap}.tip b{color:var(--tp);font-size:14px}.tip i{display:inline-block;width:12px;height:2px;background:var(--c1);vertical-align:middle;margin-right:6px}
 </style></head><body>
 <header><b>LLF Checklist</b><span id=st></span></header>
-<div id=tabs><button data-t=chk class=on>Checklist</button><button data-t=ver>Verify</button><button data-t=app>Approval</button></div>
+<div id=tabs><button data-t=chk class=on>Checklist</button><button data-t=fix>Returned</button><button data-t=ver>Verify</button><button data-t=app>Approval</button><button data-t=trd>Trends</button></div>
 <div id=chk>
 <div class=bar>
 <div><label>Location</label><select id=loc></select></div>
@@ -34,6 +43,7 @@ button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 <div><label>Email (gets PDF)</label><input id=mail type=email readonly></div>
 <div><label>Your personal code</label><input id=code type=password autocomplete=off></div>
 </div>
+<div class=bar id=rb></div>
 <div id=f></div>
 <div class=bar><div id=msg class=w></div><button id=go class=w>Submit checklist</button></div>
 </div>
@@ -45,8 +55,21 @@ button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 <div id=wmsg style="margin:8px"></div>
 <div id=wlist></div><div id=wrep></div>
 </div>
+<div id=trd style="display:none">
+<div class=bar><div class=w><b style="font-size:17px">Trends</b><div style="font-size:12px;color:#f0d98a">One reading over time, or the items flagged most often in a month.</div></div>
+<div><label>Your name</label><select id=tn></select></div>
+<div><label>Your personal code</label><input id=tc type=password autocomplete=off></div>
+<div><label>Location</label><select id=tl></select></div>
+<div><label>Equipment</label><select id=te></select></div>
+<div class=w><label>Reading</label><select id=tf></select></div>
+<button id=ts class=w>Show trend of this reading</button>
+<div><label>Month</label><input id=tm type=month></div><button id=tg style="align-self:end">Most flagged items</button></div>
+<div id=tmsg style="display:none;margin:8px;background:#161616;border:2px solid var(--acc);border-radius:8px;padding:14px;text-align:center;font-weight:600"></div>
+<div id=tout></div>
+</div>
 <script>
 const API='https://script.google.com/macros/s/AKfycbzyTGkosf9BgOGX5nRov3_7Yfov3-gVSClyiscFr_wad-uXjHU4QXuc9of_zKC_utYX/exec',$=s=>document.querySelector(s),LS=localStorage,H=['loc','shift','date','by','mail','code'];
+let PH={};try{PH=JSON.parse(LS.phd||'{}')}catch(e){} // photos waiting to be sent: {equipment: data URL}
 let VN=JSON.parse(LS.vn||'[]'),AN=JSON.parse(LS.an||'[]'),WS='',M=JSON.parse(LS.master||'[]'),E=JSON.parse(LS.emp||'[]'),D=JSON.parse(LS.draft||'{"h":{},"v":{}}');
 const rng=t=>{const m=String(t).replace(/[\u2013\u2014]/g,'-').match(/^\s*(-?\d+(?:\.\d+)?)\s*-\s*(-?\d+(?:\.\d+)?)\s*$/);return m?[+m[1],+m[2]]:(isNaN(+t)||t===''?null:[-Infinity,+t])};
 const bad=(el)=>{const v=el.value;if(el.dataset.lo!==undefined)return +v<+el.dataset.lo||+v>+el.dataset.hi;return /^(Not OK|Yes)$|Rattling|humming|Whistling|Squealing/.test(v)};
@@ -55,10 +78,15 @@ function render(){
  const loc=$('#loc').value,g={};
  M.filter(r=>r[0]==loc).forEach(r=>(g[r[1]]=g[r[1]]||[]).push(r));
  $('#f').innerHTML=Object.entries(g).map(([e,fs])=>`<div class=card><b>${e}</b><div class=g>`+fs.map(r=>{const k=e+'|'+r[2],v=D.v[k]??'',num=r[3]=='num',R=num?rng(r[5]):null;
-  return `<div><label>${r[2]}${r[4]?' ('+r[4]+')':''}${R?' OP '+(R[0]==-Infinity?'max '+R[1]:R[0]+'-'+R[1]):''}</label>`+(num?`<input type=number step=any inputmode=decimal data-k="${k}"${R?` data-lo="${R[0]}" data-hi="${R[1]}"`:''} value="${v}">`:`<select data-k="${k}"${r[5]=='Running|Standby'?' data-st=1':''}><option value="">`+r[5].split('|').map(o=>`<option${o==v?' selected':''}>${o}`).join('')+'</select>')+'</div>'}).join('')+`</div><input data-k="${e}|Remark" placeholder="Any abnormality found (required if red)" value="${D.v[e+'|Remark']??''}"></div>`).join('');
+  return `<div><label>${r[2]}${r[4]?' ('+r[4]+')':''}${R?' OP '+(R[0]==-Infinity?'max '+R[1]:R[0]+'-'+R[1]):''}</label>`+(num?`<input type=number step=any inputmode=decimal data-k="${k}"${R?` data-lo="${R[0]}" data-hi="${R[1]}"`:''} value="${v}">`:`<select data-k="${k}"${r[5]=='Running|Standby'?' data-st=1':''}><option value="">`+r[5].split('|').map(o=>`<option${o==v?' selected':''}>${o}`).join('')+'</select>')+'</div>'}).join('')+`</div><input data-k="${e}|Remark" placeholder="Any abnormality found (required if red)" value="${D.v[e+'|Remark']??''}"><div><label class=ph><span>\u{1F4F7} Add photo</span><input type=file accept="image/*" capture=environment data-ph="${e.replace(/"/g,'&quot;')}" hidden></label><span class=pt data-pt="${e.replace(/"/g,'&quot;')}"></span></div></div>`).join('');
  document.querySelectorAll('[data-st]').forEach(applyStatus);
- document.querySelectorAll('[data-lo],select[data-k]').forEach(mark);
+ document.querySelectorAll('[data-lo],select[data-k]').forEach(mark);showThumbs();
 }
+function showThumbs(){document.querySelectorAll('[data-pt]').forEach(s=>{const e=s.dataset.pt,d=PH[e];s.innerHTML=d?`<img src="${d}"><a href="#" data-rm="${e.replace(/"/g,'&quot;')}">Remove</a>`:''})}
+function savePH(){try{LS.phd=JSON.stringify(PH)}catch(x){}}
+function shrink(file,cb){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,1024/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.6))};im.onerror=()=>cb(null);im.src=r.result};r.onerror=()=>cb(null);r.readAsDataURL(file)}
+document.addEventListener('change',ev=>{const t=ev.target;if(t.dataset.ph===undefined||!t.files[0])return;const e=t.dataset.ph;shrink(t.files[0],d=>{t.value='';if(!d)return alert('This photo could not be read. Try again.');if(Object.keys(PH).length>=8&&!PH[e])return alert('Up to 8 photos per checklist.');PH[e]=d;savePH();showThumbs()})});
+document.addEventListener('click',ev=>{const a=ev.target.closest('[data-rm]');if(a){ev.preventDefault();delete PH[a.dataset.rm];savePH();showThumbs()}});
 function applyStatus(s){ // Standby: this machine's readings are greyed out, locked and cleared (they are not required)
  const off=s.value=='Standby',pre=s.dataset.k.split('|')[1].replace(/Status$/,'');
  s.closest('.card').querySelectorAll('[data-k]').forEach(i=>{const f=i.dataset.k.split('|')[1];
@@ -73,21 +101,37 @@ function init(){
  $('#by').innerHTML='<option value="">Select name'+E.map(r=>`<option>${r[0]}`).join('');
  delete D.h.code;H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); if(!$('#date').value)$('#date').valueAsDate=new Date(); render();
 }
-document.addEventListener('input',e=>{if(e.target.closest('#wf'))return;if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k)mark(e.target);save()});
+document.addEventListener('input',e=>{if(e.target.closest('#wf'))return;if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};PH={};savePH();render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k)mark(e.target);save()});
 $('#go').onclick=()=>{
- save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.disabled&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.lastElementChild.value);
+ save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.disabled&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.querySelector('[data-k$="|Remark"]').value);
  if(!H.slice(0,4).every(i=>D.h[i])||!$('#code').value)return alert('Fill location, shift, date, name and your personal code.');
  if(miss.length){miss.forEach(i=>i.classList.add('miss'));return note('Fill all readings then press Submit checklist')}
- if(noR.length){noR[0].scrollIntoView({block:'center'});noR[0].lastElementChild.focus();return alert('Write the abnormality remark for items marked red.')}
- const Q=JSON.parse(LS.queue||'[]');Q.push({id:crypto.randomUUID(),...D.h,code:$('#code').value,vals:D.v});LS.queue=JSON.stringify(Q);$('#code').value='';
- D.v={};LS.draft=JSON.stringify(D);render();sync();note('Please wait until top right corner says All sent');
+ if(noR.length){const ri=noR[0].querySelector('[data-k$="|Remark"]');ri.scrollIntoView({block:'center'});ri.focus();return alert('Write the abnormality remark for items marked red.')}
+ const bd=[...document.querySelectorAll('.bad')].filter(i=>!i.disabled);
+ if(bd.length)return confirmBad(bd);
+ doSubmit();
 };
+function confirmBad(bd){ // "3 readings are out of range, submit anyway?" - shown above the Submit button
+ const n=bd.length,L=bd.slice(0,6).map(i=>i.closest('.card').querySelector('b').textContent+' · '+i.parentNode.querySelector('label').textContent.replace(/\s*OP .*$/,'')+': '+i.value);
+ const m=$('#msg'),t=document.createElement('div'),r=document.createElement('div'),y=document.createElement('button'),b=document.createElement('button');
+ t.textContent=n+(n>1?' readings are':' reading is')+' out of range: '+L.join('; ')+(n>6?'; and '+(n-6)+' more':'')+'. Submit anyway?';
+ r.className='r';y.textContent='Submit anyway';b.textContent='Go back';b.style.cssText='background:#444;color:#fff';y.onclick=doSubmit;
+ r.append(y,b);m.textContent='';m.append(t,r);m.style.display='block';m.scrollIntoView({block:'nearest'});T=Date.now();
+}
+function doSubmit(){
+ const eqs=new Set([...document.querySelectorAll('.card>b')].map(b=>b.textContent)),ph={};Object.keys(PH).forEach(k=>{if(eqs.has(k))ph[k]=PH[k]});
+ const it={id:crypto.randomUUID(),...D.h,code:$('#code').value,vals:D.v};if(Object.keys(ph).length)it.photos=ph;if(D.rep)it.replaces=D.rep;
+ const Q=JSON.parse(LS.queue||'[]');Q.push(it);let dropped=false;
+ try{LS.queue=JSON.stringify(Q)}catch(x){if(!it.photos)return alert('Phone storage is full, so this checklist could not be saved. Free some space and press Submit again.');delete it.photos;dropped=true;try{LS.queue=JSON.stringify(Q)}catch(y){return alert('Phone storage is full, so this checklist could not be saved. Free some space and press Submit again.')}}
+ $('#code').value='';D.v={};delete D.rep;$('#rb').style.display='none';PH={};savePH();LS.draft=JSON.stringify(D);render();sync();
+ note((dropped?'Photos were too big for the phone and were NOT attached. ':'')+'Please wait until top right corner says All sent');
+}
 let T=0;
 function note(t){const m=$('#msg');m.textContent=t;m.style.display='block';m.scrollIntoView({block:'nearest'});T=Date.now()}
 document.addEventListener('click',()=>{if(Date.now()-T>400){$('#msg').style.display='none';document.querySelectorAll('.miss').forEach(i=>i.classList.remove('miss'))}}); // any tap on the screen closes the message (the 400 ms guard stops the Submit tap itself from closing it)
 async function sync(){
  let Q=JSON.parse(LS.queue||'[]'),msg='';
- while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok&&r.auth&&!Object.keys(D.v).length){const it=Q.shift();LS.queue=JSON.stringify(Q);msg='Not sent: wrong code';D.h={loc:it.loc,shift:it.shift,date:it.date,by:it.by,mail:it.mail};D.v=it.vals;LS.draft=JSON.stringify(D);init();alert(r.err+'. Your checklist is back on the screen: enter the right code and submit again.');break}if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg='Not sent: '+e;break}}
+ while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok&&r.auth&&!Object.keys(D.v).length){const it=Q.shift();LS.queue=JSON.stringify(Q);msg='Not sent: wrong code';D.h={loc:it.loc,shift:it.shift,date:it.date,by:it.by,mail:it.mail};D.v=it.vals;if(it.replaces)D.rep=it.replaces;PH=it.photos||{};savePH();LS.draft=JSON.stringify(D);init();alert(r.err+'. Your checklist is back on the screen: enter the right code and submit again.');break}if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg='Not sent: '+e;break}}
  $('#st').textContent=msg||(Q.length?Q.length+' waiting for signal':'All sent')
 }
 // draw the checklist at once from the copy saved on this phone, then refresh it quietly in the background
@@ -100,17 +144,22 @@ sync();
  if(changed)init()}catch(e){if(!M.length)$('#f').innerHTML='<div class=card><b>Could not load the checklist.</b><div>Check the signal and reopen the app.</div></div>'}})();
 // ---- Verify / Approval tabs (need internet)
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function loadFix(r){ // puts the returned report back into the checklist form for correction
+ const v={};r.rows.forEach(x=>{v[x[0]+'|'+x[1]]=String(x[2])});const m=r.meta;
+ D.h={loc:m.loc,shift:m.shift,date:m.date,by:m.by,mail:(E.find(z=>z[0]==m.by)||[])[1]||''};D.v=v;D.rep=m.id;PH={};savePH();LS.draft=JSON.stringify(D);
+ tab('chk');init();$('#code').value='';const b=$('#rb');b.textContent='Correcting a returned report'+(m.retBy?' (returned by '+m.retBy+')':'')+': '+m.reason+'. Fix it, enter your personal code and press Submit checklist. Photos you attached before stay with the report.';b.style.display='block';window.scrollTo(0,0);
+}
 function wmsg(t){const m=$('#wmsg');m.textContent=t;m.style.display=t?'block':'none'}
+const TT={ver:['Verify reports','Read the checklist, then verify it with your name.','Verifiers'],app:['Approval (UAIL)','Read the verified checklist, then approve it with your name.','Approvers'],fix:['Returned to me','Reports your verifier or approver sent back. Open one, correct it and submit it again.','Employees']};
 function tab(t){
- $('#chk').style.display=t=='chk'?'':'none';$('#wf').style.display=t=='chk'?'none':'block';
+ $('#chk').style.display=t=='chk'?'':'none';$('#wf').style.display=(t=='ver'||t=='app'||t=='fix')?'block':'none';$('#trd').style.display=t=='trd'?'block':'none';
  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));
- if(t=='chk')return;
- WS=t=='ver'?'verify':'approve';const L=t=='ver'?VN:AN;
- $('#wt').textContent=t=='ver'?'Verify reports':'Approval (UAIL)';
- $('#wd').textContent=t=='ver'?'Read the checklist, then verify it with your name.':'Read the verified checklist, then approve it with your name.';
+ if(t=='chk')return;if(t=='trd')return trInit();
+ WS=t=='ver'?'verify':t=='app'?'approve':'fix';const L=t=='ver'?VN:t=='app'?AN:E.map(r=>r[0]);
+ $('#wt').textContent=TT[t][0];$('#wd').textContent=TT[t][1];
  $('#wn').innerHTML='<option value="">Select your name'+L.map(n=>`<option>${esc(n)}`).join('');
  try{const s=LS['wn_'+WS];if(s&&L.includes(s))$('#wn').value=s}catch(e){}
- $('#wlist').innerHTML='';$('#wrep').innerHTML='';wmsg(L.length?'':'No names are listed yet. Add them in the '+(t=='ver'?'Verifiers':'Approvers')+' tab of the Google Sheet.')
+ $('#wlist').innerHTML='';$('#wrep').innerHTML='';wmsg(L.length?'':'No names are listed yet. Add them in the '+TT[t][2]+' tab of the Google Sheet.')
 }
 $('#tabs').onclick=e=>{const t=e.target.dataset.t;if(t)tab(t)};
 async function api(o){try{const r=await fetch(API,{method:'POST',body:JSON.stringify({stage:WS,code:$('#wc').value,name:$('#wn').value,...o})});return await r.json()}catch(e){return{ok:false,err:'No signal. This step needs internet.'}}}
@@ -119,7 +168,7 @@ async function wlist(){
  $('#wrep').innerHTML='';wmsg('Loading...');
  const r=await api({action:'list'});if(!r.ok){$('#wlist').innerHTML='';return wmsg(r.err)}
  wmsg(r.items.length?'':'No reports are waiting for this step.');
- $('#wlist').innerHTML=r.items.map(x=>`<div class="card item" data-id="${esc(x.id)}"><b>${esc(x.loc)} &middot; ${esc(x.date)} &middot; Shift ${esc(x.shift)}</b><div style="font-size:13px">Checked by ${esc(x.by)}${x.ver?' &middot; Verified by '+esc(x.ver):''}</div><div style="font-size:12px;color:${x.flags?'#ff8a8a':'#8fe3a0'}">${x.flags?x.flags+' reading(s) out of range / abnormal':'All readings normal'}</div></div>`).join('')
+ $('#wlist').innerHTML=r.items.map(x=>`<div class="card item" data-id="${esc(x.id)}"><b>${esc(x.loc)} &middot; ${esc(x.date)} &middot; Shift ${esc(x.shift)}</b><div style="font-size:13px">Checked by ${esc(x.by)}${x.ver?' &middot; Verified by '+esc(x.ver):''}</div>${x.reason?'<div style="font-size:13px;color:#ffd27a">Returned'+(x.retBy?' by '+esc(x.retBy):'')+': '+esc(x.reason)+'</div>':''}<div style="font-size:12px;color:${x.flags?'#ff8a8a':'#8fe3a0'}">${x.flags?x.flags+' reading(s) out of range / abnormal':'All readings normal'}</div></div>`).join('')
 }
 $('#wl').onclick=wlist;
 $('#wlist').onclick=e=>{const c=e.target.closest('.item');if(c)wopen(c.dataset.id)};
@@ -129,16 +178,78 @@ async function wopen(id){
  $('#wlist').innerHTML='';
  $('#wrep').innerHTML=`<div class=bar><div class=w><b style="font-size:17px">${esc(m.loc)} &middot; ${esc(m.date)} &middot; Shift ${esc(m.shift)}</b><div style="font-size:13px">Checked by ${esc(m.by)}${m.ver?' &middot; Verified by '+esc(m.ver)+' ('+esc(m.verAt)+')':''}</div></div></div>`
  +Object.entries(g).map(([e,fs])=>`<div class="card rp"><b>${esc(e)}</b><table>`+fs.map(x=>`<tr class="${x[4]?'f':''}"><td>${esc(x[1])}</td><td><b>${esc(x[2])}</b> ${esc(x[5])}</td><td>${x[3]?'OP '+esc(String(x[3]).replace(/\s*-\s*/,'-')):''}</td><td>${esc(x[4])}</td></tr>`).join('')+`</table>${rem[e]?'<div style="color:#ff8a8a;margin-top:4px"><b>Remark:</b> '+esc(rem[e])+'</div>':''}</div>`).join('')
- +`<div class=bar><button id=wback class=w style="background:#444;color:#fff">Back to list</button><button id=wsign class=w>I have read this report - ${WS=='verify'?'Verify':'Approve'}</button></div>`;
+ +(r.photos&&r.photos.length?`<div class="card rp"><b>Photos from the checker</b>`+r.photos.map(x=>`<div style="margin-top:8px">${esc(x.e)}<br><img src="${esc(x.d)}" style="max-width:100%;border-radius:4px"></div>`).join('')+'</div>':'')
+ +(WS=='fix'?`<div class=bar><div class=w style="color:#ffd27a"><b>Returned${m.retBy?' by '+esc(m.retBy):''}:</b> ${esc(m.reason)}</div><button id=wback class=w style="background:#444;color:#fff">Back to list</button><button id=wfix class=w>Correct this report and resubmit</button></div>`
+ :`<div class=bar><div class=w><label>Return to checker (write the reason)</label><input id=wrs maxlength=300 placeholder="e.g. Drive motor-1 R current looks wrong"></div><button id=wret class=w style="background:#7a2d2d;color:#fff">Return to checker</button><button id=wback class=w style="background:#444;color:#fff">Back to list</button><button id=wsign class=w>I have read this report - ${WS=='verify'?'Verify':'Approve'}</button></div>`);
  window.scrollTo(0,0);
  $('#wback').onclick=wlist;
- $('#wsign').onclick=async()=>{
+ if(WS=='fix')$('#wfix').onclick=()=>loadFix(r);
+ else $('#wret').onclick=async()=>{const rs=$('#wrs').value.trim();if(rs.length<3){window.scrollTo(0,0);return wmsg('Write the reason for returning this report')}
+  if(!confirm('Return this report to '+m.by+'?'))return;const q=await api({action:'return',id,reason:rs});if(!q.ok){window.scrollTo(0,0);return wmsg(q.err)}
+  await wlist();wmsg('Returned to '+m.by+'. They will be emailed.');window.scrollTo(0,0)};
+ if(WS!='fix')$('#wsign').onclick=async()=>{
   const name=$('#wn').value;if(!name){window.scrollTo(0,0);return wmsg('Select your name first')}
   if(!confirm((WS=='verify'?'Verify':'Approve')+' this report as '+name+'?'))return;
   const s=await api({action:'sign',id});if(!s.ok){window.scrollTo(0,0);return wmsg(s.err)}
   try{LS['wn_'+WS]=name}catch(e){}
   await wlist();wmsg('Done. Report '+(WS=='verify'?'verified':'approved')+' by '+name+'.'+(s.warn?' '+s.warn:''));window.scrollTo(0,0)
  }
+}
+
+// ---- Trends tab (needs internet)
+function tmsg(t){const m=$('#tmsg');m.textContent=t;m.style.display=t?'block':'none'}
+function trInit(){
+ const nm=[...new Set([...E.map(r=>r[0]),...VN,...AN])].sort();
+ $('#tn').innerHTML='<option value="">Select your name'+nm.map(n=>`<option>${esc(n)}`).join('');
+ try{const s=LS.wn_trd;if(s&&nm.includes(s))$('#tn').value=s}catch(e){}
+ $('#tl').innerHTML=[...new Set(M.map(r=>r[0]))].map(l=>`<option>${esc(l)}`).join('');trEq();
+ if(!$('#tm').value)$('#tm').value=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,7);
+}
+function trEq(){const l=$('#tl').value;$('#te').innerHTML=[...new Set(M.filter(r=>r[0]==l&&r[3]=='num').map(r=>r[1]))].map(e=>`<option>${esc(e)}`).join('');trF()}
+function trF(){const l=$('#tl').value,e=$('#te').value;$('#tf').innerHTML=M.filter(r=>r[0]==l&&r[1]==e&&r[3]=='num').map(r=>`<option>${esc(r[2])}`).join('')}
+$('#tl').onchange=trEq;$('#te').onchange=trF;
+async function tapi(o){if(!$('#tn').value||!$('#tc').value){tmsg('Select your name and enter your personal code');return{ok:false,silent:1}}
+ tmsg('Loading...');try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify({stage:'trend',name:$('#tn').value,code:$('#tc').value,...o})})).json();if(r.ok){tmsg('');try{LS.wn_trd=$('#tn').value}catch(e){}}else tmsg(r.err);return r}catch(e){tmsg('No signal. Trends need internet.');return{ok:false,silent:1}}}
+$('#ts').onclick=async()=>{const r=await tapi({action:'series',loc:$('#tl').value,equip:$('#te').value,field:$('#tf').value});if(r.ok)drawLine(r,$('#te').value+' · '+$('#tf').value,$('#tl').value)};
+$('#tg').onclick=async()=>{const r=await tapi({action:'flags',loc:$('#tl').value,month:$('#tm').value});if(r.ok)drawBars(r,$('#tl').value)};
+const NS='http://www.w3.org/2000/svg',el=(n,a,t)=>{const x=document.createElementNS(NS,n);for(const k in a)x.setAttribute(k,a[k]);if(t!=null)x.textContent=t;return x};
+function card(title,sub){const c=document.createElement('div');c.className='viz';const h=document.createElement('h3');h.textContent=title;const u=document.createElement('div');u.className='sub';u.textContent=sub;const tip=document.createElement('div');tip.className='tip';c.append(h,u);return{c,tip}}
+function table(c,head,rows){const d=document.createElement('details'),sm=document.createElement('summary');sm.textContent='Table view';const t=document.createElement('table'),hr=t.insertRow();head.forEach(x=>{const th=document.createElement('th');th.textContent=x;hr.append(th)});rows.forEach(r=>{const tr=t.insertRow();r.forEach((x,i)=>{const td=tr.insertCell();td.textContent=x;if(i==r.length-1&&x&&head[i]=='Status')td.className='b'})});d.append(sm,t);c.append(d)}
+function nice(mn,mx,n){const raw=(mx-mn)/n,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p,st=(f<=1?1:f<=2?2:f<=5?5:10)*p;return{a:Math.floor(mn/st+1e-9)*st,b:Math.ceil(mx/st-1e-9)*st,st}} // round axis ticks (1, 2, 5 x 10^k)
+function drawLine(r,title,loc){
+ const out=$('#tout');out.textContent='';const P=r.points,rg=rng(r.range),lo=rg?rg[0]:null,hi=rg?rg[1]:null,u=r.unit?' '+r.unit:'';
+ const {c,tip}=card(title+' ('+loc+')',P.length?'Last '+P.length+' checklists, oldest to newest'+(rg?' · shaded band = operating range '+String(r.range).replace(/\s*-\s*/,'–'):''):'No readings yet');
+ out.append(c);if(!P.length)return;
+ const W=Math.max(300,out.clientWidth-40),Ht=240,L=44,R=16,Tp=14,B=34,vals=P.map(x=>+x[2]);
+ let mn=Math.min(...vals,lo!=null&&isFinite(lo)?lo:Infinity),mx=Math.max(...vals,hi!=null?hi:-Infinity);if(mn==mx){mn-=1;mx+=1}const nz=nice(mn,mx,4);mn=nz.a;mx=nz.b;
+ const X=i=>P.length==1?L+(W-L-R)/2:L+i*(W-L-R)/(P.length-1),Y=v=>Tp+(1-(v-mn)/(mx-mn))*(Ht-Tp-B),bad=v=>(lo!=null&&v<lo)||(hi!=null&&v>hi);
+ const svg=el('svg',{viewBox:`0 0 ${W} ${Ht}`,role:'img','aria-label':title+' trend'});
+ const f=v=>Math.abs(v)>=100?v.toFixed(0):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2);
+ const dp=Math.max(0,-Math.floor(Math.log10(nz.st)+1e-9));
+ for(let v=mn,k=0;v<=mx+nz.st/2;v+=nz.st,k++){const y=Y(v);svg.append(el('line',{x1:L,x2:W-R,y1:y,y2:y,stroke:k?'var(--gr)':'var(--ba)','stroke-width':1}),el('text',{x:L-6,y:y+4,'text-anchor':'end'},v.toFixed(dp)))}
+ if(rg&&hi!=null){const a=Y(hi),b=Y(isFinite(lo)?Math.max(lo,mn):mn);svg.append(el('rect',{x:L,y:a,width:W-L-R,height:Math.max(0,b-a),fill:'#ffffff','fill-opacity':.07}))}
+ [0,Math.floor((P.length-1)/2),P.length-1].filter((v,i,a)=>a.indexOf(v)==i).forEach((i,k,a)=>svg.append(el('text',{x:X(i),y:Ht-14,'text-anchor':a.length==1?'middle':k==0?'start':k==a.length-1?'end':'middle'},P[i][0].slice(5)+' '+P[i][1])));
+ svg.append(el('polyline',{points:P.map((x,i)=>X(i)+','+Y(+x[2])).join(' '),fill:'none',stroke:'var(--c1)','stroke-width':2,'stroke-linejoin':'round'}));
+ P.forEach((x,i)=>{const b=bad(+x[2]);if(b)svg.append(el('circle',{cx:X(i),cy:Y(+x[2]),r:5,fill:'var(--bad)',stroke:'var(--s1)','stroke-width':2}));else if(P.length<=30||i==P.length-1)svg.append(el('circle',{cx:X(i),cy:Y(+x[2]),r:4,fill:'var(--c1)',stroke:'var(--s1)','stroke-width':2}))});
+ const lv=vals[vals.length-1],lx=X(P.length-1);svg.append(el('text',{x:Math.min(lx,W-R),y:Y(lv)-10,'text-anchor':'end',class:'v'},f(lv)+u));
+ const cr=el('line',{y1:Tp,y2:Ht-B,stroke:'var(--mu)','stroke-width':1,visibility:'hidden'}),hit=el('rect',{x:L,y:0,width:W-L,height:Ht,fill:'transparent'});svg.append(cr,hit);c.append(svg,tip);
+ const show=ev=>{const bx=svg.getBoundingClientRect(),px=(ev.clientX-bx.left)*W/bx.width;let i=Math.round((px-L)/((W-L-R)/Math.max(1,P.length-1)));i=Math.max(0,Math.min(P.length-1,i));
+  cr.setAttribute('x1',X(i));cr.setAttribute('x2',X(i));cr.setAttribute('visibility','visible');const v=+P[i][2];tip.textContent='';const b1=document.createElement('b'),k=document.createElement('i');b1.textContent=f(v)+u;tip.append(k,b1,document.createElement('br'),document.createTextNode(P[i][0]+' · Shift '+P[i][1]+(bad(v)?' · '+(v>hi?'HIGH':'LOW'):'')));
+  tip.style.display='block';const cb=c.getBoundingClientRect();tip.style.left=Math.max(4,Math.min(cb.width-tip.offsetWidth-4,ev.clientX-cb.left-tip.offsetWidth/2))+'px';tip.style.top=Math.max(40,ev.clientY-cb.top-tip.offsetHeight-14)+'px'};
+ hit.addEventListener('pointermove',show);hit.addEventListener('pointerdown',show);hit.addEventListener('pointerleave',()=>{cr.setAttribute('visibility','hidden');tip.style.display='none'});
+ table(c,['Date','Shift','Value','Status'],P.slice().reverse().map(x=>[x[0],x[1],x[2]+u,bad(+x[2])?(+x[2]>hi?'HIGH':'LOW'):'']));
+}
+function drawBars(r,loc){
+ const out=$('#tout');out.textContent='';const T=r.top;
+ const {c,tip}=card('Most flagged items · '+(loc||'all locations'),r.month+' · '+r.subs+' checklist'+(r.subs==1?'':'s')+' submitted'+(T.length?'':' · nothing was flagged'));out.append(c);if(!T.length)return;
+ const W=Math.max(300,out.clientWidth-40),RH=40,Ht=T.length*RH+4,mx=T[0][1],bw=W-48,svg=el('svg',{viewBox:`0 0 ${W} ${Ht}`,role:'img','aria-label':'Most flagged items'});
+ T.forEach(([k,n],i)=>{const y=i*RH,w=Math.max(4,n/mx*bw),rr=4;
+  svg.append(el('text',{x:0,y:y+13,class:'l'},k.length>52?k.slice(0,51)+'…':k));
+  const g=el('path',{d:`M0,${y+19} H${w-rr} a${rr},${rr} 0 0 1 ${rr},${rr} v${14-2*rr} a${rr},${rr} 0 0 1 -${rr},${rr} H0 Z`,fill:'var(--c1)',tabindex:0,'aria-label':k+': '+n});
+  const hit=el('rect',{x:0,y:y,width:W,height:RH,fill:'transparent'});svg.append(g,el('text',{x:w+6,y:y+31,class:'v'},n));svg.append(hit);
+  const sh=ev=>{tip.textContent='';const b=document.createElement('b');b.textContent=n+(n==1?' time':' times');tip.append(b,document.createElement('br'),document.createTextNode(k));tip.style.display='block';const cb=c.getBoundingClientRect();tip.style.left=Math.max(4,Math.min(cb.width-tip.offsetWidth-4,ev.clientX-cb.left-tip.offsetWidth/2))+'px';tip.style.top=Math.max(40,ev.clientY-cb.top-tip.offsetHeight-14)+'px';g.setAttribute('fill-opacity',.8)};
+  hit.addEventListener('pointermove',sh);hit.addEventListener('pointerdown',sh);hit.addEventListener('pointerleave',()=>{tip.style.display='none';g.setAttribute('fill-opacity',1)})});
+ c.append(svg,tip);table(c,['Item','Times flagged'],T.map(([k,n])=>[k,n]));
 }
 addEventListener('online',sync);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
