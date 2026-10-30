@@ -90,7 +90,14 @@ async function sync(){
  while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok&&r.auth&&!Object.keys(D.v).length){const it=Q.shift();LS.queue=JSON.stringify(Q);msg='Not sent: wrong code';D.h={loc:it.loc,shift:it.shift,date:it.date,by:it.by,mail:it.mail};D.v=it.vals;LS.draft=JSON.stringify(D);init();alert(r.err+'. Your checklist is back on the screen: enter the right code and submit again.');break}if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg='Not sent: '+e;break}}
  $('#st').textContent=msg||(Q.length?Q.length+' waiting for signal':'All sent')
 }
-(async()=>{try{const r=await(await fetch(API)).json();M=Array.isArray(r)?r:r.m;if(r.e&&r.e.length)E=r.e;if(r.v)VN=r.v;if(r.a)AN=r.a;LS.master=JSON.stringify(M);LS.emp=JSON.stringify(E);LS.vn=JSON.stringify(VN);LS.an=JSON.stringify(AN)}catch(e){}init();sync()})();
+// draw the checklist at once from the copy saved on this phone, then refresh it quietly in the background
+if(M.length)init();else $('#f').innerHTML='<div class=card><b>Loading checklist...</b><div style="font-size:12px;color:#f0d98a">The first time, this needs signal and can take a few seconds.</div></div>';
+sync();
+(async()=>{try{const r=await(await fetch(API)).json(),nm=Array.isArray(r)?r:r.m,ne=r.e&&r.e.length?r.e:E;
+ const changed=!M.length||JSON.stringify(nm)!=JSON.stringify(M)||JSON.stringify(ne)!=JSON.stringify(E);
+ if(changed&&M.length)save(); // keep anything already typed
+ M=nm;E=ne;if(r.v)VN=r.v;if(r.a)AN=r.a;LS.master=JSON.stringify(M);LS.emp=JSON.stringify(E);LS.vn=JSON.stringify(VN);LS.an=JSON.stringify(AN);
+ if(changed)init()}catch(e){if(!M.length)$('#f').innerHTML='<div class=card><b>Could not load the checklist.</b><div>Check the signal and reopen the app.</div></div>'}})();
 // ---- Verify / Approval tabs (need internet)
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function wmsg(t){const m=$('#wmsg');m.textContent=t;m.style.display=t?'block':'none'}
