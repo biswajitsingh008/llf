@@ -31,6 +31,7 @@ button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 .viz svg{display:block;width:100%;touch-action:pan-y}.viz text{fill:var(--mu);font-size:11px;font-family:inherit}.viz text.v{fill:var(--tp);font-weight:600;paint-order:stroke;stroke:var(--s1);stroke-width:3px}.viz text.l{fill:var(--ts)}
 .viz details{margin-top:8px;font-size:12px;color:var(--ts)}.viz summary{cursor:pointer;padding:6px 0}.viz table{width:100%;border-collapse:collapse}.viz td,.viz th{padding:3px 4px;border-top:1px solid var(--gr);text-align:left}.viz td.b{color:#ff8a8a;font-weight:600}
 .tip{position:absolute;display:none;pointer-events:none;background:#0b0b0b;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:6px 8px;font-size:12px;color:var(--ts);z-index:3;white-space:nowrap}.tip b{color:var(--tp);font-size:14px}.tip i{display:inline-block;width:12px;height:2px;background:var(--c1);vertical-align:middle;margin-right:6px}
+.lr{font-size:11px;color:#cfc7a8;margin-top:2px}.lr.w{color:#ffb74d;font-weight:700}.x10{box-shadow:0 0 0 2px #ffb74d;border-color:#ffb74d!important}.prev{border-left-color:#ffb74d}.prev .pf{font-size:13px;margin-top:4px}
 </style></head><body>
 <header><b>LLF Checklist</b><span id=st></span></header>
 <div id=tabs><button data-t=chk class=on>Checklist</button><button data-t=fix>Returned</button><button data-t=ver>Verify</button><button data-t=app>Approval</button><button data-t=trd>Trends</button></div>
@@ -70,17 +71,23 @@ button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 <script>
 const API='https://script.google.com/macros/s/AKfycbzyTGkosf9BgOGX5nRov3_7Yfov3-gVSClyiscFr_wad-uXjHU4QXuc9of_zKC_utYX/exec',$=s=>document.querySelector(s),LS=localStorage,H=['loc','shift','date','by','mail','code'];
 let PH={};try{PH=JSON.parse(LS.phd||'{}')}catch(e){} // photos waiting to be sent: {equipment: data URL}
-let VN=JSON.parse(LS.vn||'[]'),AN=JSON.parse(LS.an||'[]'),WS='',M=JSON.parse(LS.master||'[]'),E=JSON.parse(LS.emp||'[]'),D=JSON.parse(LS.draft||'{"h":{},"v":{}}');
+let LAST=JSON.parse(LS.last||'{}'),VN=JSON.parse(LS.vn||'[]'),AN=JSON.parse(LS.an||'[]'),WS='',M=JSON.parse(LS.master||'[]'),E=JSON.parse(LS.emp||'[]'),D=JSON.parse(LS.draft||'{"h":{},"v":{}}');
 const rng=t=>{const m=String(t).replace(/[\u2013\u2014]/g,'-').match(/^\s*(-?\d+(?:\.\d+)?)\s*-\s*(-?\d+(?:\.\d+)?)\s*$/);return m?[+m[1],+m[2]]:(isNaN(+t)||t===''?null:[-Infinity,+t])};
 const bad=(el)=>{const v=el.value;if(el.dataset.lo!==undefined)return +v<+el.dataset.lo||+v>+el.dataset.hi;return /^(Not OK|Yes)$|Rattling|humming|Whistling|Squealing/.test(v)};
 function mark(el){el.classList.toggle('bad',!!el.value&&bad(el));const c=el.closest('.card');if(c)c.classList.toggle('flag',!!c.querySelector('.bad'))}
+const q=s=>String(s==null?'':s).replace(/[&<>"]/g,'');
+function lv(k){const L=LAST[$('#loc').value];return L&&L.vals?L.vals[k]:undefined}
+function lastHint(k){const v=lv(k);return v===undefined?'':'<div class=lr>Last: '+q(v)+'</div>'}
+function chk10(el){const last=+lv(el.dataset.k),v=+el.value,h=el.closest('div').querySelector('.lr'),off=el.type=='number'&&last>0&&v>0&&(v/last>=8||v/last<=.125);el.classList.toggle('x10',off);if(h){h.classList.toggle('w',off);h.textContent='Last: '+q(lv(el.dataset.k))+(off?' - about 10x different, check':'')}}
+function prevCard(loc){const L=LAST[loc];if(!L)return '';const fl=String(L.flags||'').split('\n').filter(Boolean);
+ return '<div class="card prev"><b>Last checklist: '+q(L.when)+' &middot; '+q(L.by)+'</b>'+(fl.length?'<div class=pf>'+fl.map(x=>'&bull; '+q(x)).join('<br>')+'</div>':'<div class=pf>No problems were flagged.</div>')+(L.rem?'<div class=pf>Remarks: '+q(L.rem)+'</div>':'')+'</div>'}
 function render(){
  const loc=$('#loc').value,g={};
  M.filter(r=>r[0]==loc).forEach(r=>(g[r[1]]=g[r[1]]||[]).push(r));
- $('#f').innerHTML=Object.entries(g).map(([e,fs])=>`<div class=card><b>${e}</b><div class=g>`+fs.map(r=>{const k=e+'|'+r[2],v=D.v[k]??'',num=r[3]=='num',R=num?rng(r[5]):null;
-  return `<div><label>${r[2]}${r[4]?' ('+r[4]+')':''}${R?' OP '+(R[0]==-Infinity?'max '+R[1]:R[0]+'-'+R[1]):''}</label>`+(num?`<input type=number step=any inputmode=decimal data-k="${k}"${R?` data-lo="${R[0]}" data-hi="${R[1]}"`:''} value="${v}">`:`<select data-k="${k}"${r[5]=='Running|Standby'?' data-st=1':''}><option value="">`+r[5].split('|').map(o=>`<option${o==v?' selected':''}>${o}`).join('')+'</select>')+'</div>'}).join('')+`</div><input data-k="${e}|Remark" placeholder="Any abnormality found (required if red)" value="${D.v[e+'|Remark']??''}"><div><label class=ph><span>\u{1F4F7} Add photo</span><input type=file accept="image/*" capture=environment data-ph="${e.replace(/"/g,'&quot;')}" hidden></label><span class=pt data-pt="${e.replace(/"/g,'&quot;')}"></span></div></div>`).join('');
+ $('#f').innerHTML=prevCard(loc)+Object.entries(g).map(([e,fs])=>`<div class=card><b>${e}</b><div class=g>`+fs.map(r=>{const k=e+'|'+r[2],v=D.v[k]??'',num=r[3]=='num',R=num?rng(r[5]):null;
+  return `<div><label>${r[2]}${r[4]?' ('+r[4]+')':''}${R?' OP '+(R[0]==-Infinity?'max '+R[1]:R[0]+'-'+R[1]):''}</label>`+(num?`<input type=number step=any inputmode=decimal data-k="${k}"${R?` data-lo="${R[0]}" data-hi="${R[1]}"`:''} value="${v}">`:`<select data-k="${k}"${r[5]=='Running|Standby'?' data-st=1':''}><option value="">`+r[5].split('|').map(o=>`<option${o==v?' selected':''}>${o}`).join('')+'</select>')+lastHint(k)+'</div>'}).join('')+`</div><input data-k="${e}|Remark" placeholder="Any abnormality found (required if red)" value="${D.v[e+'|Remark']??''}"><div><label class=ph><span>\u{1F4F7} Add photo</span><input type=file accept="image/*" capture=environment data-ph="${e.replace(/"/g,'&quot;')}" hidden></label><span class=pt data-pt="${e.replace(/"/g,'&quot;')}"></span></div></div>`).join('');
  document.querySelectorAll('[data-st]').forEach(applyStatus);
- document.querySelectorAll('[data-lo],select[data-k]').forEach(mark);showThumbs();
+ document.querySelectorAll('[data-lo],select[data-k]').forEach(mark);document.querySelectorAll('input[type=number][data-k]').forEach(i=>{if(i.value)chk10(i)});showThumbs();
 }
 function showThumbs(){document.querySelectorAll('[data-pt]').forEach(s=>{const e=s.dataset.pt,d=PH[e];s.innerHTML=d?`<img src="${d}"><a href="#" data-rm="${e.replace(/"/g,'&quot;')}">Remove</a>`:''})}
 function savePH(){try{LS.phd=JSON.stringify(PH)}catch(x){}}
@@ -101,13 +108,14 @@ function init(){
  $('#by').innerHTML='<option value="">Select name'+E.map(r=>`<option>${r[0]}`).join('');
  delete D.h.code;H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); limDate(); render();
 }
-document.addEventListener('input',e=>{if(e.target.closest('#wf'))return;if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};PH={};savePH();render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k)mark(e.target);save()});
+document.addEventListener('input',e=>{if(e.target.closest('#wf'))return;if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};PH={};savePH();render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k){mark(e.target);chk10(e.target)}save()});
 $('#go').onclick=()=>{
  save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.disabled&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.querySelector('[data-k$="|Remark"]').value);
  if(!H.slice(0,4).every(i=>D.h[i])||!$('#code').value)return alert('Fill location, shift, date, name and your personal code.');
  {const [lo,hi]=dateLim(),dv=$('#date').value;if(!D.rep&&(dv<lo||dv>hi)){limDate();return alert('The date must be today or yesterday. It has been set to today: check it and press Submit again.')}}
  if(miss.length){miss.forEach(i=>i.classList.add('miss'));return note('Fill all readings then press Submit checklist')}
  if(noR.length){const ri=noR[0].querySelector('[data-k$="|Remark"]');ri.scrollIntoView({block:'center'});ri.focus();return alert('Write the abnormality remark for items marked red.')}
+ {const x=[...document.querySelectorAll('.x10')].filter(i=>!i.disabled);if(x.length&&!confirm(x.length+' reading(s) look about 10 times different from the last checklist (orange boxes). Send anyway?'))return}
  const bd=[...document.querySelectorAll('.bad')].filter(i=>!i.disabled);
  if(bd.length)return confirmBad(bd);
  doSubmit();
@@ -143,9 +151,9 @@ async function sync(){
 if(M.length)init();else $('#f').innerHTML='<div class=card><b>Loading checklist...</b><div style="font-size:12px;color:#f0d98a">The first time, this needs signal and can take a few seconds.</div></div>';
 sync();
 (async()=>{try{const r=await(await fetch(API)).json(),nm=Array.isArray(r)?r:r.m,ne=r.e&&r.e.length?r.e:E;
- const changed=!M.length||JSON.stringify(nm)!=JSON.stringify(M)||JSON.stringify(ne)!=JSON.stringify(E);
+ const changed=!M.length||JSON.stringify(nm)!=JSON.stringify(M)||JSON.stringify(ne)!=JSON.stringify(E)||JSON.stringify(r.l||{})!=JSON.stringify(LAST);
  if(changed&&M.length)save(); // keep anything already typed
- M=nm;E=ne;if(r.v)VN=r.v;if(r.a)AN=r.a;LS.master=JSON.stringify(M);LS.emp=JSON.stringify(E);LS.vn=JSON.stringify(VN);LS.an=JSON.stringify(AN);
+ M=nm;E=ne;if(r.l){LAST=r.l;LS.last=JSON.stringify(LAST)}if(r.v)VN=r.v;if(r.a)AN=r.a;LS.master=JSON.stringify(M);LS.emp=JSON.stringify(E);LS.vn=JSON.stringify(VN);LS.an=JSON.stringify(AN);
  if(changed)init()}catch(e){if(!M.length)$('#f').innerHTML='<div class=card><b>Could not load the checklist.</b><div>Check the signal and reopen the app.</div></div>'}})();
 // ---- Verify / Approval tabs (need internet)
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
