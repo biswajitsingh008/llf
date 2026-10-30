@@ -99,12 +99,13 @@ function save(){H.forEach(i=>{if(i!='code')D.h[i]=$('#'+i).value});delete D.h.co
 function init(){
  $('#loc').innerHTML=[...new Set(M.map(r=>r[0]))].map(l=>`<option>${l}`).join('');
  $('#by').innerHTML='<option value="">Select name'+E.map(r=>`<option>${r[0]}`).join('');
- delete D.h.code;H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); if(!$('#date').value)$('#date').valueAsDate=new Date(); render();
+ delete D.h.code;H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); limDate(); render();
 }
 document.addEventListener('input',e=>{if(e.target.closest('#wf'))return;if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};PH={};savePH();render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k)mark(e.target);save()});
 $('#go').onclick=()=>{
  save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.disabled&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.querySelector('[data-k$="|Remark"]').value);
  if(!H.slice(0,4).every(i=>D.h[i])||!$('#code').value)return alert('Fill location, shift, date, name and your personal code.');
+ {const [lo,hi]=dateLim(),dv=$('#date').value;if(!D.rep&&(dv<lo||dv>hi)){limDate();return alert('The date must be today or yesterday. It has been set to today: check it and press Submit again.')}}
  if(miss.length){miss.forEach(i=>i.classList.add('miss'));return note('Fill all readings then press Submit checklist')}
  if(noR.length){const ri=noR[0].querySelector('[data-k$="|Remark"]');ri.scrollIntoView({block:'center'});ri.focus();return alert('Write the abnormality remark for items marked red.')}
  const bd=[...document.querySelectorAll('.bad')].filter(i=>!i.disabled);
@@ -126,12 +127,16 @@ function doSubmit(){
  $('#code').value='';D.v={};delete D.rep;$('#rb').style.display='none';PH={};savePH();LS.draft=JSON.stringify(D);render();sync();
  note((dropped?'Photos were too big for the phone and were NOT attached. ':'')+'Please wait until top right corner says All sent');
 }
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function dateLim(){const t=new Date(),y=new Date(t.getFullYear(),t.getMonth(),t.getDate()-1);return [ymd(y),ymd(t)]} // [yesterday, today]
+function limDate(){const el=$('#date'),[lo,hi]=dateLim();el.min=lo;el.max=hi;if(!D.rep&&(!el.value||el.value<lo||el.value>hi)){el.value=hi;save()}} // only today or yesterday; a returned report being corrected keeps its own date
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)limDate()});
 let T=0;
 function note(t){const m=$('#msg');m.textContent=t;m.style.display='block';m.scrollIntoView({block:'nearest'});T=Date.now()}
 document.addEventListener('click',()=>{if(Date.now()-T>400){$('#msg').style.display='none';document.querySelectorAll('.miss').forEach(i=>i.classList.remove('miss'))}}); // any tap on the screen closes the message (the 400 ms guard stops the Submit tap itself from closing it)
 async function sync(){
  let Q=JSON.parse(LS.queue||'[]'),msg='';
- while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok&&r.auth&&!Object.keys(D.v).length){const it=Q.shift();LS.queue=JSON.stringify(Q);msg='Not sent: wrong code';D.h={loc:it.loc,shift:it.shift,date:it.date,by:it.by,mail:it.mail};D.v=it.vals;if(it.replaces)D.rep=it.replaces;PH=it.photos||{};savePH();LS.draft=JSON.stringify(D);init();alert(r.err+'. Your checklist is back on the screen: enter the right code and submit again.');break}if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg='Not sent: '+e;break}}
+ while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok&&(r.auth||r.back)&&!Object.keys(D.v).length){const it=Q.shift();LS.queue=JSON.stringify(Q);msg=r.auth?'Not sent: wrong code':'Not sent: wrong date';D.h={loc:it.loc,shift:it.shift,date:it.date,by:it.by,mail:it.mail};D.v=it.vals;if(it.replaces)D.rep=it.replaces;PH=it.photos||{};savePH();LS.draft=JSON.stringify(D);init();alert(r.err+'. Your checklist is back on the screen: '+(r.auth?'enter the right code':'choose the right date')+' and submit again.');break}if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg='Not sent: '+e;break}}
  $('#st').textContent=msg||(Q.length?Q.length+' waiting for signal':'All sent')
 }
 // draw the checklist at once from the copy saved on this phone, then refresh it quietly in the background
