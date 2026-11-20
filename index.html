@@ -111,8 +111,13 @@ function save(){H.forEach(i=>{if(i!='code')D.h[i]=$('#'+i).value});delete D.h.co
 function init(){
  $('#loc').innerHTML=[...new Set(M.map(r=>r[0]))].map(l=>`<option>${l}`).join('');
  $('#by').innerHTML='<option value="">'+tx('sel_name')+E.map(r=>`<option>${r[0]}`).join('');
- delete D.h.code;H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); limDate(); render();
+ delete D.h.code;H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));lockShift();setMail(); limDate(); render();
 }
+// shift is set by the clock (India time): 6AM-2PM = A, 2PM-10PM = B, 10PM-6AM = C. The box is locked; a returned report keeps its own shift.
+function nowShift(){const h=+new Intl.DateTimeFormat('en-GB',{hour:'2-digit',hour12:false,timeZone:'Asia/Kolkata'}).format(new Date())%24;return h>=6&&h<14?'A':h>=14&&h<22?'B':'C'}
+function shiftDate(){return nowShift()=='C'&&+new Intl.DateTimeFormat('en-GB',{hour:'2-digit',hour12:false,timeZone:'Asia/Kolkata'}).format(new Date())%24<6?istDay(1):istDay(0)} // night shift C after midnight belongs to the day it started
+function lockShift(){const s=$('#shift');if(!D.rep)s.value=nowShift();s.disabled=true}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!D.rep&&!Object.keys(D.v||{}).length&&$('#shift')){$('#shift').value=nowShift();limDate();save()}});
 document.addEventListener('input',e=>{if(e.target.closest('#wf'))return;if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};PH={};savePH();render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k){mark(e.target);chk10(e.target)}save()});
 $('#go').onclick=()=>{
  save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.disabled&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.querySelector('[data-k$="|Remark"]').value);
@@ -141,8 +146,9 @@ function doSubmit(){
  note((dropped?tx('photos_big'):'')+tx('wait_sent'));
 }
 const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-function dateLim(){const t=new Date(),y=new Date(t.getFullYear(),t.getMonth(),t.getDate()-1);return [ymd(y),ymd(t)]} // [yesterday, today]
-function limDate(){const el=$('#date'),[lo,hi]=dateLim();el.min=lo;el.max=hi;if(!D.rep&&(!el.value||el.value<lo||el.value>hi)){el.value=hi;save()}} // only today or yesterday; a returned report being corrected keeps its own date
+function istDay(back){const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kolkata'}).format(new Date()).split('-').map(Number),d=new Date(Date.UTC(p[0],p[1]-1,p[2]-(back||0)));return d.toISOString().slice(0,10)}
+function dateLim(){return [istDay(1),istDay(0)]} // [yesterday, today] in India time
+function limDate(){const el=$('#date'),[lo,hi]=dateLim();el.min=lo;el.max=hi;if(!D.rep&&(!el.value||!Object.keys(D.v||{}).length)){const w=shiftDate();if(el.value!=w){el.value=w;save()}}if(D.rep)el.disabled=true} // only today or yesterday; a returned report being corrected keeps its own date
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)limDate()});
 let T=0;
 function note(t){const m=$('#msg');m.textContent=t;m.style.display='block';m.scrollIntoView({block:'nearest'});T=Date.now()}
