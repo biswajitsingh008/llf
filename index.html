@@ -1,9 +1,9 @@
-<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,interactive-widget=resizes-content"><link rel=manifest href=manifest.json><link rel=apple-touch-icon href=icon-192.png><meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-title content=LLF><meta name=apple-mobile-web-app-status-bar-style content=black><meta name=theme-color content="#0a0a0a"><title>LLF Checklist</title>
+<!doctype html><html lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,interactive-widget=resizes-content"><link rel=manifest href=manifest.json><link rel=apple-touch-icon href=icon-192.png><meta name=apple-mobile-web-app-capable content=yes><meta name=mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-title content=LLF><meta name=apple-mobile-web-app-status-bar-style content=black><meta name=theme-color content="#0a0a0a"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Noto+Sans+Oriya:wght@400;700&display=swap"><title>LLF Checklist</title>
 <style>
 :root{--ink:#fff;--card:rgba(12,12,12,.52);--acc:#d4a017;--bad:#ff5252}
-body{overscroll-behavior-y:contain;margin:0;font:15px/1.35 system-ui,sans-serif;background:linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,.12)),url(bg.jpg) center/cover no-repeat fixed #0b0b0b;color:#fff;min-height:100vh;color-scheme:dark}
+body{overscroll-behavior-y:contain;margin:0;font:15px/1.35 system-ui,'Noto Sans Oriya','Noto Sans',sans-serif;background:linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,.12)),url(bg.jpg) center/cover no-repeat fixed #0b0b0b;color:#fff;min-height:100vh;color-scheme:dark}
 header{background:rgba(10,10,10,.85);color:#fff;padding:10px 12px;position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;gap:8px}
-header b{font-size:17px}#st{font-size:12px;text-align:right}
+header b{font-size:17px}header button#lg{width:auto;padding:4px 12px;font-size:14px;margin:0 8px 0 auto}#st{font-size:12px;text-align:right}
 .bar,.card{background:var(--card);margin:8px;padding:10px;border-radius:6px;border-left:4px solid var(--acc);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
 .bar{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bar .w{grid-column:1/3}
 .g{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:6px;margin:6px 0}
@@ -33,67 +33,71 @@ button{background:var(--acc);color:#111;border:0;padding:14px;font-weight:700}
 .tip{position:absolute;display:none;pointer-events:none;background:#0b0b0b;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:6px 8px;font-size:12px;color:var(--ts);z-index:3;white-space:nowrap}.tip b{color:var(--tp);font-size:14px}.tip i{display:inline-block;width:12px;height:2px;background:var(--c1);vertical-align:middle;margin-right:6px}
 .lr{font-size:11px;color:#cfc7a8;margin-top:2px}.lr.w{color:#ffb74d;font-weight:700}.x10{box-shadow:0 0 0 2px #ffb74d;border-color:#ffb74d!important}.prev{border-left-color:#ffb74d}.prev .pf{font-size:13px;margin-top:4px}
 </style></head><body>
-<header><b>LLF Checklist</b><span id=st></span></header>
-<div id=tabs><button data-t=chk class=on>Checklist</button><button data-t=fix>Returned</button><button data-t=ver>Verify</button><button data-t=app>Approval</button><button data-t=trd>Trends</button></div>
+<header><b data-i=title>LLF Checklist</b><button id=lg type=button></button><span id=st></span></header>
+<div id=tabs><button data-t=chk data-i=tab_chk class=on>Checklist</button><button data-t=fix data-i=tab_fix>Returned</button><button data-t=ver data-i=tab_ver>Verify</button><button data-t=app data-i=tab_app>Approval</button><button data-t=trd data-i=tab_trd>Trends</button></div>
 <div id=chk>
 <div class=bar>
-<div><label>Location</label><select id=loc></select></div>
-<div><label>Shift</label><select id=shift><option>A<option>B<option>C</select></div>
-<div><label>Date</label><input id=date type=date></div>
-<div><label>Checked by</label><select id=by></select></div>
-<div><label>Email (gets PDF)</label><input id=mail type=email readonly></div>
-<div><label>Your personal code</label><input id=code type=password autocomplete=off></div>
+<div><label data-i=l_loc>Location</label><select id=loc></select></div>
+<div><label data-i=l_shift>Shift</label><select id=shift><option>A<option>B<option>C</select></div>
+<div><label data-i=l_date>Date</label><input id=date type=date></div>
+<div><label data-i=l_by>Checked by</label><select id=by></select></div>
+<div><label data-i=l_mail>Email (gets PDF)</label><input id=mail type=email readonly></div>
+<div><label data-i=l_code>Your personal code</label><input id=code type=password autocomplete=off></div>
 </div>
 <div class=bar id=rb></div>
 <div id=f></div>
-<div class=bar><div id=msg class=w></div><button id=go class=w>Submit checklist</button></div>
+<div class=bar><div id=msg class=w></div><button id=go class=w data-i=submit>Submit checklist</button></div>
 </div>
 <div id=wf style="display:none">
 <div class=bar><div class=w><b id=wt style="font-size:17px"></b><div id=wd style="font-size:12px;color:#f0d98a"></div></div>
-<div><label>Your name</label><select id=wn></select></div>
-<div><label>Your personal code</label><input id=wc type=password autocomplete=off></div>
-<button id=wl class=w>Show reports waiting</button></div>
+<div><label data-i=l_name>Your name</label><select id=wn></select></div>
+<div><label data-i=l_code>Your personal code</label><input id=wc type=password autocomplete=off></div>
+<button id=wl class=w data-i=w_show>Show reports waiting</button></div>
 <div id=wmsg style="margin:8px"></div>
 <div id=wlist></div><div id=wrep></div>
 </div>
 <div id=trd style="display:none">
-<div class=bar><div class=w><b style="font-size:17px">Trends</b><div style="font-size:12px;color:#f0d98a">One reading over time, or the items flagged most often in a month.</div></div>
-<div><label>Your name</label><select id=tn></select></div>
-<div><label>Your personal code</label><input id=tc type=password autocomplete=off></div>
-<div><label>Location</label><select id=tl></select></div>
-<div><label>Equipment</label><select id=te></select></div>
-<div class=w><label>Reading</label><select id=tf></select></div>
-<button id=ts class=w>Show trend of this reading</button>
-<div><label>Month</label><input id=tm type=month></div><button id=tg style="align-self:end">Most flagged items</button></div>
+<div class=bar><div class=w><b style="font-size:17px" data-i=tr_title>Trends</b><div style="font-size:12px;color:#f0d98a" data-i=tr_desc>One reading over time, or the items flagged most often in a month.</div></div>
+<div><label data-i=l_name>Your name</label><select id=tn></select></div>
+<div><label data-i=l_code>Your personal code</label><input id=tc type=password autocomplete=off></div>
+<div><label data-i=l_loc>Location</label><select id=tl></select></div>
+<div><label data-i=tr_equip>Equipment</label><select id=te></select></div>
+<div class=w><label data-i=tr_read>Reading</label><select id=tf></select></div>
+<button id=ts class=w data-i=tr_show>Show trend of this reading</button>
+<div><label data-i=tr_month>Month</label><input id=tm type=month></div><button id=tg style="align-self:end" data-i=tr_flag>Most flagged items</button></div>
 <div id=tmsg style="display:none;margin:8px;background:#161616;border:2px solid var(--acc);border-radius:8px;padding:14px;text-align:center;font-weight:600"></div>
 <div id=tout></div>
 </div>
 <script>
 const API='https://script.google.com/macros/s/AKfycbzyTGkosf9BgOGX5nRov3_7Yfov3-gVSClyiscFr_wad-uXjHU4QXuc9of_zKC_utYX/exec',$=s=>document.querySelector(s),LS=localStorage,H=['loc','shift','date','by','mail','code'];
 let PH={};try{PH=JSON.parse(LS.phd||'{}')}catch(e){} // photos waiting to be sent: {equipment: data URL}
+const I={"en": {"title": "LLF Checklist", "tab_chk": "Checklist", "tab_fix": "Returned", "tab_ver": "Verify", "tab_app": "Approval", "tab_trd": "Trends", "l_loc": "Location", "l_shift": "Shift", "l_date": "Date", "l_by": "Checked by", "l_mail": "Email (gets PDF)", "l_code": "Your personal code", "l_name": "Your name", "submit": "Submit checklist", "w_show": "Show reports waiting", "tr_title": "Trends", "tr_desc": "One reading over time, or the items flagged most often in a month.", "tr_equip": "Equipment", "tr_read": "Reading", "tr_show": "Show trend of this reading", "tr_month": "Month", "tr_flag": "Most flagged items", "sel_name": "Select name", "sel_yname": "Select your name", "remark_ph": "Any abnormality found (required if red)", "take_photo": "Take photo", "choose_photo": "Choose photo", "remove": "Remove", "last": "Last: ", "x10": " - about 10x different, check", "prev_title": "Last checklist: ", "prev_none": "No problems were flagged.", "prev_rem": "Remarks: ", "load_t": "Loading checklist...", "load_d": "The first time, this needs signal and can take a few seconds.", "noload_t": "Could not load the checklist.", "noload_d": "Check the signal and reopen the app.", "photo_unread": "This photo could not be read. Try again, or use the other photo button.", "photo_max": "Up to 8 photos per checklist.", "draft": "Draft saved ", "fill_hdr": "Fill location, shift, date, name and your personal code.", "date_lim": "The date must be today or yesterday. It has been set to today: check it and press Submit again.", "fill_all": "Fill all readings then press Submit checklist", "need_rem": "Write the abnormality remark for items marked red.", "x10_conf": "{n} reading(s) look about 10 times different from the last checklist (orange boxes). Send anyway?", "bad1": "{n} reading is out of range: {list}{more}. Submit anyway?", "badN": "{n} readings are out of range: {list}{more}. Submit anyway?", "more": "; and {k} more", "sub_any": "Submit anyway", "go_back": "Go back", "storage": "Phone storage is full, so this checklist could not be saved. Free some space and press Submit again.", "photos_big": "Photos were too big for the phone and were NOT attached. ", "wait_sent": "Please wait until top right corner says All sent", "ns_code": "Not sent: wrong code", "ns_date": "Not sent: wrong date", "back_msg": ". Your checklist is back on the screen: ", "right_code": "enter the right code", "right_date": "choose the right date", "and_again": " and submit again.", "not_sent": "Not sent: ", "waiting_sig": " waiting for signal", "all_sent": "All sent", "refreshed": "Data refreshed ", "nosig_refresh": "No signal: could not refresh", "refreshing": "Refreshing...", "leave": "This checklist is not submitted yet. Your draft is saved on this phone.\n\nLeave the app?", "corr": "Correcting a returned report", "corr_by": " (returned by {n})", "corr_end": "Fix it, enter your personal code and press Submit checklist. Photos you attached before stay with the report.", "tt_ver_t": "Verify reports", "tt_ver_d": "Read the checklist, then verify it with your name.", "tt_app_t": "Approval (UAIL)", "tt_app_d": "Read the verified checklist, then approve it with your name.", "tt_fix_t": "Returned to me", "tt_fix_d": "Reports your verifier or approver sent back. Open one, correct it and submit it again.", "no_names": "No names are listed yet. Add them in the {tab} tab of the Google Sheet.", "sel_first": "Select your name first", "loading": "Loading...", "none_wait": "No reports are waiting for this step.", "load_rep": "Loading report...", "shift_w": "Shift ", "checked_by": "Checked by ", "verified_by": "Verified by ", "returned": "Returned", "ret_by": " by {n}", "flags_n": " reading(s) out of range / abnormal", "all_normal": "All readings normal", "photos_chk": "Photos from the checker", "remark_w": "Remark:", "back_list": "Back to list", "fix_resub": "Correct this report and resubmit", "ret_label": "Return to checker (write the reason)", "ret_ph": "e.g. Drive motor-1 R current looks wrong", "ret_btn": "Return to checker", "read_ver": "I have read this report - Verify", "read_app": "I have read this report - Approve", "ret_reason": "Write the reason for returning this report", "ret_conf": "Return this report to {n}?", "ret_done": "Returned to {n}. They will be emailed.", "conf_ver": "Verify this report as {n}?", "conf_app": "Approve this report as {n}?", "done_ver": "Done. Report verified by {n}.", "done_app": "Done. Report approved by {n}.", "nosig_step": "No signal. This step needs internet.", "tr_need": "Select your name and enter your personal code", "tr_nosig": "No signal. Trends need internet.", "tr_sub": "Last {n} checklists, oldest to newest", "tr_band": " · shaded band = operating range ", "tr_none": "No readings yet", "tbl_view": "Table view", "th_date": "Date", "th_shift": "Shift", "th_value": "Value", "th_status": "Status", "th_item": "Item", "th_times": "Times flagged", "mf_title": "Most flagged items · ", "mf_all": "all locations", "mf_sub": " checklists submitted", "mf_nothing": " · nothing was flagged", "mf_sub1": " checklist submitted", "time1": " time", "timeN": " times"}, "or": {"title": "LLF ଚେକ୍‌ଲିଷ୍ଟ", "tab_chk": "ଚେକ୍‌ଲିଷ୍ଟ", "tab_fix": "ଫେରାଇଥିବା", "tab_ver": "ସତ୍ୟାପନ", "tab_app": "ଅନୁମୋଦନ", "tab_trd": "ଧାରା", "l_loc": "ସ୍ଥାନ", "l_shift": "ସିଫ୍ଟ", "l_date": "ତାରିଖ", "l_by": "ଯାଞ୍ଚ କରିଥିବା ବ୍ୟକ୍ତି", "l_mail": "ଇମେଲ୍ (PDF ପାଇବ)", "l_code": "ଆପଣଙ୍କ ବ୍ୟକ୍ତିଗତ କୋଡ୍", "l_name": "ଆପଣଙ୍କ ନାମ", "submit": "ଚେକ୍‌ଲିଷ୍ଟ ଦାଖଲ କରନ୍ତୁ", "w_show": "ଅପେକ୍ଷାରେ ଥିବା ରିପୋର୍ଟ ଦେଖାନ୍ତୁ", "tr_title": "ଧାରା", "tr_desc": "ଗୋଟିଏ ରିଡିଂର ସମୟ ସହିତ ପରିବର୍ତ୍ତନ, କିମ୍ବା ମାସରେ ସର୍ବାଧିକ ଥର ଚିହ୍ନିତ ଆଇଟମ୍।", "tr_equip": "ଯନ୍ତ୍ର", "tr_read": "ରିଡିଂ", "tr_show": "ଏହି ରିଡିଂର ଧାରା ଦେଖାନ୍ତୁ", "tr_month": "ମାସ", "tr_flag": "ସର୍ବାଧିକ ଚିହ୍ନିତ ଆଇଟମ୍", "sel_name": "ନାମ ବାଛନ୍ତୁ", "sel_yname": "ଆପଣଙ୍କ ନାମ ବାଛନ୍ତୁ", "remark_ph": "କିଛି ଅସ୍ୱାଭାବିକ ମିଳିଲେ ଲେଖନ୍ତୁ (ଲାଲ୍ ହେଲେ ଆବଶ୍ୟକ)", "take_photo": "ଫଟୋ ଉଠାନ୍ତୁ", "choose_photo": "ଫଟୋ ବାଛନ୍ତୁ", "remove": "ହଟାନ୍ତୁ", "last": "ଗତଥର: ", "x10": " - ପ୍ରାୟ ୧୦ ଗୁଣ ଭିନ୍ନ, ଯାଞ୍ଚ କରନ୍ତୁ", "prev_title": "ଗତ ଚେକ୍‌ଲିଷ୍ଟ: ", "prev_none": "କୌଣସି ସମସ୍ୟା ଚିହ୍ନଟ ହୋଇନାହିଁ।", "prev_rem": "ମନ୍ତବ୍ୟ: ", "load_t": "ଚେକ୍‌ଲିଷ୍ଟ ଲୋଡ୍ ହେଉଛି...", "load_d": "ପ୍ରଥମ ଥର ପାଇଁ ସିଗନାଲ୍ ଦରକାର, କିଛି ସେକେଣ୍ଡ ଲାଗିପାରେ।", "noload_t": "ଚେକ୍‌ଲିଷ୍ଟ ଲୋଡ୍ ହେଲା ନାହିଁ।", "noload_d": "ସିଗନାଲ୍ ଯାଞ୍ଚ କରି ଆପ୍ ପୁଣି ଖୋଲନ୍ତୁ।", "photo_unread": "ଏହି ଫଟୋ ପଢ଼ାଗଲା ନାହିଁ। ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ, କିମ୍ବା ଅନ୍ୟ ଫଟୋ ବଟନ୍ ବ୍ୟବହାର କରନ୍ତୁ।", "photo_max": "ପ୍ରତି ଚେକ୍‌ଲିଷ୍ଟରେ ସର୍ବାଧିକ ୮ଟି ଫଟୋ।", "draft": "ଡ୍ରାଫ୍ଟ ସଂରକ୍ଷିତ ", "fill_hdr": "ସ୍ଥାନ, ସିଫ୍ଟ, ତାରିଖ, ନାମ ଓ ଆପଣଙ୍କ ବ୍ୟକ୍ତିଗତ କୋଡ୍ ଭରନ୍ତୁ।", "date_lim": "ତାରିଖ ଆଜି କିମ୍ବା ଗତକାଲି ହେବା ଦରକାର। ଏହାକୁ ଆଜି କରାଯାଇଛି: ଯାଞ୍ଚ କରି ପୁଣି ଦାଖଲ କରନ୍ତୁ।", "fill_all": "ସବୁ ରିଡିଂ ଭରନ୍ତୁ, ଏହା ପରେ ଚେକ୍‌ଲିଷ୍ଟ ଦାଖଲ କରନ୍ତୁ ଦବାନ୍ତୁ", "need_rem": "ଲାଲ୍ ଚିହ୍ନିତ ଆଇଟମ୍ ପାଇଁ ଅସ୍ୱାଭାବିକତାର ମନ୍ତବ୍ୟ ଲେଖନ୍ତୁ।", "x10_conf": "{n}ଟି ରିଡିଂ ଗତ ଚେକ୍‌ଲିଷ୍ଟଠାରୁ ପ୍ରାୟ ୧୦ ଗୁଣ ଭିନ୍ନ ଦିଶୁଛି (କମଳା ବକ୍ସ)। ତଥାପି ପଠାଇବେ?", "bad1": "{n}ଟି ରିଡିଂ ସୀମା ବାହାରେ: {list}{more}। ତଥାପି ଦାଖଲ କରିବେ?", "badN": "{n}ଟି ରିଡିଂ ସୀମା ବାହାରେ: {list}{more}। ତଥାପି ଦାଖଲ କରିବେ?", "more": "; ଏବଂ ଆଉ {k}ଟି", "sub_any": "ତଥାପି ଦାଖଲ କରନ୍ତୁ", "go_back": "ପଛକୁ ଫେରନ୍ତୁ", "storage": "ଫୋନ୍‌ର ସ୍ଥାନ ପୂର୍ଣ୍ଣ ହୋଇଯାଇଛି, ତେଣୁ ଏହି ଚେକ୍‌ଲିଷ୍ଟ ସେଭ୍ ହେଲା ନାହିଁ। କିଛି ସ୍ଥାନ ଖାଲି କରି ପୁଣି ଦାଖଲ କରନ୍ତୁ।", "photos_big": "ଫଟୋଗୁଡ଼ିକ ଫୋନ୍ ପାଇଁ ବହୁତ ବଡ଼ ଥିଲା ଏବଂ ଯୋଡ଼ାଗଲା ନାହିଁ। ", "wait_sent": "ଉପର ଡାହାଣ କୋଣରେ \"ସବୁ ପଠାଗଲା\" ଦେଖାଯିବା ପର୍ଯ୍ୟନ୍ତ ଅପେକ୍ଷା କରନ୍ତୁ", "ns_code": "ପଠାଯାଇନାହିଁ: ଭୁଲ୍ କୋଡ୍", "ns_date": "ପଠାଯାଇନାହିଁ: ଭୁଲ୍ ତାରିଖ", "back_msg": "। ଆପଣଙ୍କ ଚେକ୍‌ଲିଷ୍ଟ ପୁଣି ସ୍କ୍ରିନ୍‌ରେ ଅଛି: ", "right_code": "ସଠିକ୍ କୋଡ୍ ଦିଅନ୍ତୁ", "right_date": "ସଠିକ୍ ତାରିଖ ବାଛନ୍ତୁ", "and_again": " ଏବଂ ପୁଣି ଦାଖଲ କରନ୍ତୁ।", "not_sent": "ପଠାଯାଇନାହିଁ: ", "waiting_sig": " ସିଗନାଲ୍ ପାଇଁ ଅପେକ୍ଷାରେ", "all_sent": "ସବୁ ପଠାଗଲା", "refreshed": "ତଥ୍ୟ ନବୀକରଣ ହେଲା ", "nosig_refresh": "ସିଗନାଲ୍ ନାହିଁ: ନବୀକରଣ ହେଲା ନାହିଁ", "refreshing": "ନବୀକରଣ ହେଉଛି...", "leave": "ଏହି ଚେକ୍‌ଲିଷ୍ଟ ଏପର୍ଯ୍ୟନ୍ତ ଦାଖଲ ହୋଇନାହିଁ। ଆପଣଙ୍କ ଡ୍ରାଫ୍ଟ ଏହି ଫୋନ୍‌ରେ ସେଭ୍ ଅଛି।\n\nଆପ୍ ଛାଡ଼ିବେ?", "corr": "ଫେରାଇଥିବା ରିପୋର୍ଟ ସଂଶୋଧନ", "corr_by": " ({n} ଫେରାଇଛନ୍ତି)", "corr_end": "ଏହାକୁ ସଂଶୋଧନ କରନ୍ତୁ, ଆପଣଙ୍କ ବ୍ୟକ୍ତିଗତ କୋଡ୍ ଦିଅନ୍ତୁ ଏବଂ ଚେକ୍‌ଲିଷ୍ଟ ଦାଖଲ କରନ୍ତୁ ଦବାନ୍ତୁ। ଆଗରୁ ଯୋଡ଼ିଥିବା ଫଟୋ ରିପୋର୍ଟ ସହିତ ରହିବ।", "tt_ver_t": "ରିପୋର୍ଟ ସତ୍ୟାପନ", "tt_ver_d": "ଚେକ୍‌ଲିଷ୍ଟ ପଢ଼ନ୍ତୁ, ଏହା ପରେ ଆପଣଙ୍କ ନାମରେ ସତ୍ୟାପନ କରନ୍ତୁ।", "tt_app_t": "ଅନୁମୋଦନ (UAIL)", "tt_app_d": "ସତ୍ୟାପିତ ଚେକ୍‌ଲିଷ୍ଟ ପଢ଼ନ୍ତୁ, ଏହା ପରେ ଆପଣଙ୍କ ନାମରେ ଅନୁମୋଦନ କରନ୍ତୁ।", "tt_fix_t": "ମୋତେ ଫେରାଇଥିବା", "tt_fix_d": "ଆପଣଙ୍କ ସତ୍ୟାପକ କିମ୍ବା ଅନୁମୋଦକ ଫେରାଇଥିବା ରିପୋର୍ଟ। ଗୋଟିଏ ଖୋଲି ସଂଶୋଧନ କରି ପୁଣି ଦାଖଲ କରନ୍ତୁ।", "no_names": "ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ନାମ ନାହିଁ। Google Sheet ର {tab} ଟ୍ୟାବ୍‌ରେ ଯୋଡ଼ନ୍ତୁ।", "sel_first": "ପ୍ରଥମେ ଆପଣଙ୍କ ନାମ ବାଛନ୍ତୁ", "loading": "ଲୋଡ୍ ହେଉଛି...", "none_wait": "ଏହି ପର୍ଯ୍ୟାୟରେ କୌଣସି ରିପୋର୍ଟ ଅପେକ୍ଷାରେ ନାହିଁ।", "load_rep": "ରିପୋର୍ଟ ଲୋଡ୍ ହେଉଛି...", "shift_w": "ସିଫ୍ଟ ", "checked_by": "ଯାଞ୍ଚ: ", "verified_by": "ସତ୍ୟାପକ: ", "returned": "ଫେରାଯାଇଛି", "ret_by": " ({n})", "flags_n": "ଟି ରିଡିଂ ସୀମା ବାହାରେ / ଅସ୍ୱାଭାବିକ", "all_normal": "ସବୁ ରିଡିଂ ସ୍ୱାଭାବିକ", "photos_chk": "ଯାଞ୍ଚକାରୀଙ୍କ ଫଟୋ", "remark_w": "ମନ୍ତବ୍ୟ:", "back_list": "ତାଲିକାକୁ ଫେରନ୍ତୁ", "fix_resub": "ଏହି ରିପୋର୍ଟ ସଂଶୋଧନ କରି ପୁଣି ଦାଖଲ କରନ୍ତୁ", "ret_label": "ଯାଞ୍ଚକାରୀଙ୍କୁ ଫେରାନ୍ତୁ (କାରଣ ଲେଖନ୍ତୁ)", "ret_ph": "ଉଦା. Drive motor-1 R କରେଣ୍ଟ ଭୁଲ୍ ଲାଗୁଛି", "ret_btn": "ଯାଞ୍ଚକାରୀଙ୍କୁ ଫେରାନ୍ତୁ", "read_ver": "ମୁଁ ଏହି ରିପୋର୍ଟ ପଢ଼ିଛି - ସତ୍ୟାପନ କରନ୍ତୁ", "read_app": "ମୁଁ ଏହି ରିପୋର୍ଟ ପଢ଼ିଛି - ଅନୁମୋଦନ କରନ୍ତୁ", "ret_reason": "ଏହି ରିପୋର୍ଟ ଫେରାଇବାର କାରଣ ଲେଖନ୍ତୁ", "ret_conf": "ଏହି ରିପୋର୍ଟ {n} ଙ୍କୁ ଫେରାଇବେ?", "ret_done": "{n} ଙ୍କୁ ଫେରାଇ ଦିଆଗଲା। ସେମାନଙ୍କୁ ଇମେଲ୍ ଯିବ।", "conf_ver": "{n} ଭାବେ ଏହି ରିପୋର୍ଟ ସତ୍ୟାପନ କରିବେ?", "conf_app": "{n} ଭାବେ ଏହି ରିପୋର୍ଟ ଅନୁମୋଦନ କରିବେ?", "done_ver": "ହୋଇଗଲା। ରିପୋର୍ଟ {n} ଙ୍କ ଦ୍ୱାରା ସତ୍ୟାପିତ।", "done_app": "ହୋଇଗଲା। ରିପୋର୍ଟ {n} ଙ୍କ ଦ୍ୱାରା ଅନୁମୋଦିତ।", "nosig_step": "ସିଗନାଲ୍ ନାହିଁ। ଏହି ପର୍ଯ୍ୟାୟ ପାଇଁ ଇଣ୍ଟରନେଟ୍ ଦରକାର।", "tr_need": "ଆପଣଙ୍କ ନାମ ବାଛନ୍ତୁ ଓ ବ୍ୟକ୍ତିଗତ କୋଡ୍ ଦିଅନ୍ତୁ", "tr_nosig": "ସିଗନାଲ୍ ନାହିଁ। ଧାରା ପାଇଁ ଇଣ୍ଟରନେଟ୍ ଦରକାର।", "tr_sub": "ଶେଷ {n}ଟି ଚେକ୍‌ଲିଷ୍ଟ, ପୁରୁଣାରୁ ନୂଆ", "tr_band": " · ଛାୟାଯୁକ୍ତ ଅଞ୍ଚଳ = ପରିଚାଳନା ସୀମା ", "tr_none": "ଏପର୍ଯ୍ୟନ୍ତ କୌଣସି ରିଡିଂ ନାହିଁ", "tbl_view": "ଟେବୁଲ୍ ଦେଖଣା", "th_date": "ତାରିଖ", "th_shift": "ସିଫ୍ଟ", "th_value": "ମୂଲ୍ୟ", "th_status": "ସ୍ଥିତି", "th_item": "ଆଇଟମ୍", "th_times": "ଚିହ୍ନିତ ଥର", "mf_title": "ସର୍ବାଧିକ ଚିହ୍ନିତ ଆଇଟମ୍ · ", "mf_all": "ସବୁ ସ୍ଥାନ", "mf_sub": " ଚେକ୍‌ଲିଷ୍ଟ ଦାଖଲ ହୋଇଛି", "mf_nothing": " · କିଛି ଚିହ୍ନିତ ହୋଇନାହିଁ", "mf_sub1": " ଚେକ୍‌ଲିଷ୍ଟ ଦାଖଲ ହୋଇଛି", "time1": " ଥର", "timeN": " ଥର"}};
+let LANG='en';try{LANG=LS.lang==='or'?'or':'en'}catch(e){}
+const tx=k=>{const o=I[LANG];return o&&o[k]!==undefined?o[k]:(I.en[k]!==undefined?I.en[k]:k)}; // all screen words live in I above; Odia = I.or (equipment names stay English)
+function applyLang(){document.documentElement.lang=LANG;document.querySelectorAll('[data-i]').forEach(e=>e.textContent=tx(e.dataset.i));$('#lg').textContent=LANG=='or'?'English':'\u0B13\u0B21\u0B3C\u0B3F\u0B06'}
 let LAST=JSON.parse(LS.last||'{}'),VN=JSON.parse(LS.vn||'[]'),AN=JSON.parse(LS.an||'[]'),WS='',M=JSON.parse(LS.master||'[]'),E=JSON.parse(LS.emp||'[]'),D=JSON.parse(LS.draft||'{"h":{},"v":{}}');
 const rng=t=>{const m=String(t).replace(/[\u2013\u2014]/g,'-').match(/^\s*(-?\d+(?:\.\d+)?)\s*-\s*(-?\d+(?:\.\d+)?)\s*$/);return m?[+m[1],+m[2]]:(isNaN(+t)||t===''?null:[-Infinity,+t])};
 const bad=(el)=>{const v=el.value;if(el.dataset.lo!==undefined)return +v<+el.dataset.lo||+v>+el.dataset.hi;return /^(Not OK|Yes)$|Rattling|humming|Whistling|Squealing/.test(v)};
 function mark(el){el.classList.toggle('bad',!!el.value&&bad(el));const c=el.closest('.card');if(c)c.classList.toggle('flag',!!c.querySelector('.bad'))}
 const q=s=>String(s==null?'':s).replace(/[&<>"]/g,'');
 function lv(k){const L=LAST[$('#loc').value];return L&&L.vals?L.vals[k]:undefined}
-function lastHint(k){const v=lv(k);return v===undefined?'':'<div class=lr>Last: '+q(v)+'</div>'}
-function chk10(el){const last=+lv(el.dataset.k),v=+el.value,h=el.closest('div').querySelector('.lr'),off=el.type=='number'&&last>0&&v>0&&(v/last>=8||v/last<=.125);el.classList.toggle('x10',off);if(h){h.classList.toggle('w',off);h.textContent='Last: '+q(lv(el.dataset.k))+(off?' - about 10x different, check':'')}}
+function lastHint(k){const v=lv(k);return v===undefined?'':'<div class=lr>'+tx('last')+q(v)+'</div>'}
+function chk10(el){const last=+lv(el.dataset.k),v=+el.value,h=el.closest('div').querySelector('.lr'),off=el.type=='number'&&last>0&&v>0&&(v/last>=8||v/last<=.125);el.classList.toggle('x10',off);if(h){h.classList.toggle('w',off);h.textContent=tx('last')+q(lv(el.dataset.k))+(off?tx('x10'):'')}}
 function prevCard(loc){const L=LAST[loc];if(!L)return '';const fl=String(L.flags||'').split('\n').filter(Boolean);
- return '<div class="card prev"><b>Last checklist: '+q(L.when)+' &middot; '+q(L.by)+'</b>'+(fl.length?'<div class=pf>'+fl.map(x=>'&bull; '+q(x)).join('<br>')+'</div>':'<div class=pf>No problems were flagged.</div>')+(L.rem?'<div class=pf>Remarks: '+q(L.rem)+'</div>':'')+'</div>'}
+ return '<div class="card prev"><b>'+tx('prev_title')+q(L.when)+' &middot; '+q(L.by)+'</b>'+(fl.length?'<div class=pf>'+fl.map(x=>'&bull; '+q(x)).join('<br>')+'</div>':'<div class=pf>'+tx('prev_none')+'</div>')+(L.rem?'<div class=pf>'+tx('prev_rem')+q(L.rem)+'</div>':'')+'</div>'}
 function render(){
  const loc=$('#loc').value,g={};
  M.filter(r=>r[0]==loc).forEach(r=>(g[r[1]]=g[r[1]]||[]).push(r));
  $('#f').innerHTML=prevCard(loc)+Object.entries(g).map(([e,fs])=>`<div class=card><b>${e}</b><div class=g>`+fs.map(r=>{const k=e+'|'+r[2],v=D.v[k]??'',num=r[3]=='num',R=num?rng(r[5]):null;
-  return `<div><label>${r[2]}${r[4]?' ('+r[4]+')':''}${R?' OP '+(R[0]==-Infinity?'max '+R[1]:R[0]+'-'+R[1]):''}</label>`+(num?`<input type=number step=any inputmode=decimal data-k="${k}"${R?` data-lo="${R[0]}" data-hi="${R[1]}"`:''} value="${v}">`:`<select data-k="${k}"${r[5]=='Running|Standby'?' data-st=1':''}><option value="">`+r[5].split('|').map(o=>`<option${o==v?' selected':''}>${o}`).join('')+'</select>')+lastHint(k)+'</div>'}).join('')+`</div><input data-k="${e}|Remark" placeholder="Any abnormality found (required if red)" value="${D.v[e+'|Remark']??''}"><div><label class=ph><span>\u{1F4F7} Take photo</span><input type=file accept="image/*" capture=environment data-ph="${e.replace(/"/g,'&quot;')}"></label><label class=ph><span>\u{1F5BC} Choose photo</span><input type=file accept="image/*" data-ph="${e.replace(/"/g,'&quot;')}"></label><span class=pt data-pt="${e.replace(/"/g,'&quot;')}"></span></div></div>`).join('');
+  return `<div><label>${r[2]}${r[4]?' ('+r[4]+')':''}${R?' OP '+(R[0]==-Infinity?'max '+R[1]:R[0]+'-'+R[1]):''}</label>`+(num?`<input type=number step=any inputmode=decimal data-k="${k}"${R?` data-lo="${R[0]}" data-hi="${R[1]}"`:''} value="${v}">`:`<select data-k="${k}"${r[5]=='Running|Standby'?' data-st=1':''}><option value="">`+r[5].split('|').map(o=>`<option${o==v?' selected':''}>${o}`).join('')+'</select>')+lastHint(k)+'</div>'}).join('')+`</div><input data-k="${e}|Remark" placeholder="${tx('remark_ph')}" value="${D.v[e+'|Remark']??''}"><div><label class=ph><span>\u{1F4F7} ${tx('take_photo')}</span><input type=file accept="image/*" capture=environment data-ph="${e.replace(/"/g,'&quot;')}"></label><label class=ph><span>\u{1F5BC} ${tx('choose_photo')}</span><input type=file accept="image/*" data-ph="${e.replace(/"/g,'&quot;')}"></label><span class=pt data-pt="${e.replace(/"/g,'&quot;')}"></span></div></div>`).join('');
  document.querySelectorAll('[data-st]').forEach(applyStatus);
  document.querySelectorAll('[data-lo],select[data-k]').forEach(mark);document.querySelectorAll('input[type=number][data-k]').forEach(i=>{if(i.value)chk10(i)});showThumbs();
 }
-function showThumbs(){document.querySelectorAll('[data-pt]').forEach(s=>{const e=s.dataset.pt,d=PH[e];s.innerHTML=d?`<img src="${d}"><a href="#" data-rm="${e.replace(/"/g,'&quot;')}">Remove</a>`:''})}
+function showThumbs(){document.querySelectorAll('[data-pt]').forEach(s=>{const e=s.dataset.pt,d=PH[e];s.innerHTML=d?`<img src="${d}"><a href="#" data-rm="${e.replace(/"/g,'&quot;')}">${tx('remove')}</a>`:''})}
 function savePH(){try{LS.phd=JSON.stringify(PH)}catch(x){}}
 function shrink(file,cb){const u=URL.createObjectURL(file),im=new Image(),done=d=>{URL.revokeObjectURL(u);cb(d)}; // reads the photo straight from the file (no huge text copy), so big camera photos do not run the phone out of memory
  im.onload=()=>{try{const k=Math.min(1,1024/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);done(c.toDataURL('image/jpeg',.6))}catch(e){done(null)}};im.onerror=()=>done(null);im.src=u}
-document.addEventListener('change',ev=>{const t=ev.target;if(t.dataset.ph===undefined||!t.files[0])return;const e=t.dataset.ph;shrink(t.files[0],d=>{t.value='';if(!d)return alert('This photo could not be read. Try again, or use the other photo button.');if(Object.keys(PH).length>=8&&!PH[e])return alert('Up to 8 photos per checklist.');PH[e]=d;savePH();showThumbs()})});
+document.addEventListener('change',ev=>{const t=ev.target;if(t.dataset.ph===undefined||!t.files[0])return;const e=t.dataset.ph;shrink(t.files[0],d=>{t.value='';if(!d)return alert(tx('photo_unread'));if(Object.keys(PH).length>=8&&!PH[e])return alert(tx('photo_max'));PH[e]=d;savePH();showThumbs()})});
 document.addEventListener('click',ev=>{const a=ev.target.closest('[data-rm]');if(a){ev.preventDefault();delete PH[a.dataset.rm];savePH();showThumbs()}});
 function applyStatus(s){ // Standby: this machine's readings are greyed out, locked and cleared (they are not required)
  const off=s.value=='Standby',pre=s.dataset.k.split('|')[1].replace(/Status$/,'');
@@ -103,20 +107,20 @@ function applyStatus(s){ // Standby: this machine's readings are greyed out, loc
 }
 function setMail(){const x=E.find(r=>r[0]==$('#by').value);$('#mail').value=x?x[1]:''}
 function save(){H.forEach(i=>{if(i!='code')D.h[i]=$('#'+i).value});delete D.h.code; // the personal code is never stored in the draft
- D.v={};document.querySelectorAll('[data-k]').forEach(i=>i.value&&(D.v[i.dataset.k]=i.value));LS.draft=JSON.stringify(D);$('#st').textContent='Draft saved '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+ D.v={};document.querySelectorAll('[data-k]').forEach(i=>i.value&&(D.v[i.dataset.k]=i.value));LS.draft=JSON.stringify(D);$('#st').textContent=tx('draft')+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
 function init(){
  $('#loc').innerHTML=[...new Set(M.map(r=>r[0]))].map(l=>`<option>${l}`).join('');
- $('#by').innerHTML='<option value="">Select name'+E.map(r=>`<option>${r[0]}`).join('');
+ $('#by').innerHTML='<option value="">'+tx('sel_name')+E.map(r=>`<option>${r[0]}`).join('');
  delete D.h.code;H.forEach(i=>D.h[i]&&($('#'+i).value=D.h[i]));setMail(); limDate(); render();
 }
 document.addEventListener('input',e=>{if(e.target.closest('#wf'))return;if(e.target.id=='by')setMail();if(e.target.id=='loc'){D.v={};PH={};savePH();render()}if(e.target.dataset.st!==undefined)applyStatus(e.target);if(e.target.dataset.k){mark(e.target);chk10(e.target)}save()});
 $('#go').onclick=()=>{
  save();const miss=[...document.querySelectorAll('[data-k]')].filter(i=>!i.value&&!i.disabled&&!i.dataset.k.endsWith('Remark')),noR=[...document.querySelectorAll('.card.flag')].filter(c=>!c.querySelector('[data-k$="|Remark"]').value);
- if(!H.slice(0,4).every(i=>D.h[i])||!$('#code').value)return alert('Fill location, shift, date, name and your personal code.');
- {const [lo,hi]=dateLim(),dv=$('#date').value;if(!D.rep&&(dv<lo||dv>hi)){limDate();return alert('The date must be today or yesterday. It has been set to today: check it and press Submit again.')}}
- if(miss.length){miss.forEach(i=>i.classList.add('miss'));return note('Fill all readings then press Submit checklist')}
- if(noR.length){const ri=noR[0].querySelector('[data-k$="|Remark"]');ri.scrollIntoView({block:'center'});ri.focus();return alert('Write the abnormality remark for items marked red.')}
- {const x=[...document.querySelectorAll('.x10')].filter(i=>!i.disabled);if(x.length&&!confirm(x.length+' reading(s) look about 10 times different from the last checklist (orange boxes). Send anyway?'))return}
+ if(!H.slice(0,4).every(i=>D.h[i])||!$('#code').value)return alert(tx('fill_hdr'));
+ {const [lo,hi]=dateLim(),dv=$('#date').value;if(!D.rep&&(dv<lo||dv>hi)){limDate();return alert(tx('date_lim'))}}
+ if(miss.length){miss.forEach(i=>i.classList.add('miss'));return note(tx('fill_all'))}
+ if(noR.length){const ri=noR[0].querySelector('[data-k$="|Remark"]');ri.scrollIntoView({block:'center'});ri.focus();return alert(tx('need_rem'))}
+ {const x=[...document.querySelectorAll('.x10')].filter(i=>!i.disabled);if(x.length&&!confirm(tx('x10_conf').replace('{n}',x.length)))return}
  const bd=[...document.querySelectorAll('.bad')].filter(i=>!i.disabled);
  if(bd.length)return confirmBad(bd);
  doSubmit();
@@ -124,17 +128,17 @@ $('#go').onclick=()=>{
 function confirmBad(bd){ // "3 readings are out of range, submit anyway?" - shown above the Submit button
  const n=bd.length,L=bd.slice(0,6).map(i=>i.closest('.card').querySelector('b').textContent+' · '+i.parentNode.querySelector('label').textContent.replace(/\s*OP .*$/,'')+': '+i.value);
  const m=$('#msg'),t=document.createElement('div'),r=document.createElement('div'),y=document.createElement('button'),b=document.createElement('button');
- t.textContent=n+(n>1?' readings are':' reading is')+' out of range: '+L.join('; ')+(n>6?'; and '+(n-6)+' more':'')+'. Submit anyway?';
- r.className='r';y.textContent='Submit anyway';b.textContent='Go back';b.style.cssText='background:#444;color:#fff';y.onclick=doSubmit;
+ t.textContent=tx(n>1?'badN':'bad1').replace('{n}',n).replace('{list}',L.join('; ')).replace('{more}',n>6?tx('more').replace('{k}',n-6):'');
+ r.className='r';y.textContent=tx('sub_any');b.textContent=tx('go_back');b.style.cssText='background:#444;color:#fff';y.onclick=doSubmit;
  r.append(y,b);m.textContent='';m.append(t,r);m.style.display='block';m.scrollIntoView({block:'nearest'});T=Date.now();
 }
 function doSubmit(){
  const eqs=new Set([...document.querySelectorAll('.card>b')].map(b=>b.textContent)),ph={};Object.keys(PH).forEach(k=>{if(eqs.has(k))ph[k]=PH[k]});
  const it={id:crypto.randomUUID(),...D.h,code:$('#code').value,vals:D.v};if(Object.keys(ph).length)it.photos=ph;if(D.rep)it.replaces=D.rep;
  const Q=JSON.parse(LS.queue||'[]');Q.push(it);let dropped=false;
- try{LS.queue=JSON.stringify(Q)}catch(x){if(!it.photos)return alert('Phone storage is full, so this checklist could not be saved. Free some space and press Submit again.');delete it.photos;dropped=true;try{LS.queue=JSON.stringify(Q)}catch(y){return alert('Phone storage is full, so this checklist could not be saved. Free some space and press Submit again.')}}
+ try{LS.queue=JSON.stringify(Q)}catch(x){if(!it.photos)return alert(tx('storage'));delete it.photos;dropped=true;try{LS.queue=JSON.stringify(Q)}catch(y){return alert(tx('storage'))}}
  $('#code').value='';D.v={};delete D.rep;$('#rb').style.display='none';PH={};savePH();LS.draft=JSON.stringify(D);render();sync();
- note((dropped?'Photos were too big for the phone and were NOT attached. ':'')+'Please wait until top right corner says All sent');
+ note((dropped?tx('photos_big'):'')+tx('wait_sent'));
 }
 const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 function dateLim(){const t=new Date(),y=new Date(t.getFullYear(),t.getMonth(),t.getDate()-1);return [ymd(y),ymd(t)]} // [yesterday, today]
@@ -145,69 +149,69 @@ function note(t){const m=$('#msg');m.textContent=t;m.style.display='block';m.scr
 document.addEventListener('click',()=>{if(Date.now()-T>400){$('#msg').style.display='none';document.querySelectorAll('.miss').forEach(i=>i.classList.remove('miss'))}}); // any tap on the screen closes the message (the 400 ms guard stops the Submit tap itself from closing it)
 async function sync(){
  let Q=JSON.parse(LS.queue||'[]'),msg='';
- while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok&&(r.auth||r.back)&&!Object.keys(D.v).length){const it=Q.shift();LS.queue=JSON.stringify(Q);msg=r.auth?'Not sent: wrong code':'Not sent: wrong date';D.h={loc:it.loc,shift:it.shift,date:it.date,by:it.by,mail:it.mail};D.v=it.vals;if(it.replaces)D.rep=it.replaces;PH=it.photos||{};savePH();LS.draft=JSON.stringify(D);init();alert(r.err+'. Your checklist is back on the screen: '+(r.auth?'enter the right code':'choose the right date')+' and submit again.');break}if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg='Not sent: '+e;break}}
- $('#st').textContent=msg||(Q.length?Q.length+' waiting for signal':'All sent')
+ while(Q.length&&navigator.onLine){try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify(Q[0])})).json();if(!r.ok&&(r.auth||r.back)&&!Object.keys(D.v).length){const it=Q.shift();LS.queue=JSON.stringify(Q);msg=tx(r.auth?'ns_code':'ns_date');D.h={loc:it.loc,shift:it.shift,date:it.date,by:it.by,mail:it.mail};D.v=it.vals;if(it.replaces)D.rep=it.replaces;PH=it.photos||{};savePH();LS.draft=JSON.stringify(D);init();alert(r.err+tx('back_msg')+tx(r.auth?'right_code':'right_date')+tx('and_again'));break}if(!r.ok)throw r.err;if(r.warn)msg=r.warn;Q.shift();LS.queue=JSON.stringify(Q)}catch(e){msg=tx('not_sent')+e;break}}
+ $('#st').textContent=msg||(Q.length?Q.length+tx('waiting_sig'):tx('all_sent'))
 }
 // draw the checklist at once from the copy saved on this phone, then refresh it quietly in the background
-if(M.length)init();else $('#f').innerHTML='<div class=card><b>Loading checklist...</b><div style="font-size:12px;color:#f0d98a">The first time, this needs signal and can take a few seconds.</div></div>';
+if(M.length)init();else $('#f').innerHTML='<div class=card><b>'+tx('load_t')+'</b><div style="font-size:12px;color:#f0d98a">'+tx('load_d')+'</div></div>';
 sync();
 async function loadData(manual){try{const r=await(await fetch(API)).json(),nm=Array.isArray(r)?r:r.m,ne=r.e&&r.e.length?r.e:E;
  const changed=!M.length||JSON.stringify(nm)!=JSON.stringify(M)||JSON.stringify(ne)!=JSON.stringify(E)||JSON.stringify(r.l||{})!=JSON.stringify(LAST);
  if(changed&&M.length)save(); // keep anything already typed
  M=nm;E=ne;if(r.l){LAST=r.l;LS.last=JSON.stringify(LAST)}if(r.v)VN=r.v;if(r.a)AN=r.a;LS.master=JSON.stringify(M);LS.emp=JSON.stringify(E);LS.vn=JSON.stringify(VN);LS.an=JSON.stringify(AN);
- if(changed)init();if(manual)$('#st').textContent='Data refreshed '+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}catch(e){if(manual)$('#st').textContent='No signal: could not refresh';if(!M.length)$('#f').innerHTML='<div class=card><b>Could not load the checklist.</b><div>Check the signal and reopen the app.</div></div>'}}
+ if(changed)init();if(manual)$('#st').textContent=tx('refreshed')+new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}catch(e){if(manual)$('#st').textContent=tx('nosig_refresh');if(!M.length)$('#f').innerHTML='<div class=card><b>'+tx('noload_t')+'</b><div>'+tx('noload_d')+'</div></div>'}}
 loadData();
 // ---- Verify / Approval tabs (need internet)
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function loadFix(r){ // puts the returned report back into the checklist form for correction
  const v={};r.rows.forEach(x=>{v[x[0]+'|'+x[1]]=String(x[2])});const m=r.meta;
  D.h={loc:m.loc,shift:m.shift,date:m.date,by:m.by,mail:(E.find(z=>z[0]==m.by)||[])[1]||''};D.v=v;D.rep=m.id;PH={};savePH();LS.draft=JSON.stringify(D);
- tab('chk');init();$('#code').value='';const b=$('#rb');b.textContent='Correcting a returned report'+(m.retBy?' (returned by '+m.retBy+')':'')+': '+m.reason+'. Fix it, enter your personal code and press Submit checklist. Photos you attached before stay with the report.';b.style.display='block';window.scrollTo(0,0);
+ tab('chk');init();$('#code').value='';const b=$('#rb');b.textContent=tx('corr')+(m.retBy?tx('corr_by').replace('{n}',m.retBy):'')+': '+m.reason+'. '+tx('corr_end');b.style.display='block';window.scrollTo(0,0);
 }
 function wmsg(t){const m=$('#wmsg');m.textContent=t;m.style.display=t?'block':'none'}
-const TT={ver:['Verify reports','Read the checklist, then verify it with your name.','Verifiers'],app:['Approval (UAIL)','Read the verified checklist, then approve it with your name.','Approvers'],fix:['Returned to me','Reports your verifier or approver sent back. Open one, correct it and submit it again.','Employees']};
+const TT={ver:['tt_ver_t','tt_ver_d','Verifiers'],app:['tt_app_t','tt_app_d','Approvers'],fix:['tt_fix_t','tt_fix_d','Employees']};
 function tab(t){
  $('#chk').style.display=t=='chk'?'':'none';$('#wf').style.display=(t=='ver'||t=='app'||t=='fix')?'block':'none';$('#trd').style.display=t=='trd'?'block':'none';
  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t==t));
  if(t=='chk')return;if(t=='trd')return trInit();
  WS=t=='ver'?'verify':t=='app'?'approve':'fix';const L=t=='ver'?VN:t=='app'?AN:E.map(r=>r[0]);
- $('#wt').textContent=TT[t][0];$('#wd').textContent=TT[t][1];
- $('#wn').innerHTML='<option value="">Select your name'+L.map(n=>`<option>${esc(n)}`).join('');
+ $('#wt').textContent=tx(TT[t][0]);$('#wd').textContent=tx(TT[t][1]);
+ $('#wn').innerHTML='<option value="">'+tx('sel_yname')+L.map(n=>`<option>${esc(n)}`).join('');
  try{const s=LS['wn_'+WS];if(s&&L.includes(s))$('#wn').value=s}catch(e){}
- $('#wlist').innerHTML='';$('#wrep').innerHTML='';wmsg(L.length?'':'No names are listed yet. Add them in the '+TT[t][2]+' tab of the Google Sheet.')
+ $('#wlist').innerHTML='';$('#wrep').innerHTML='';wmsg(L.length?'':tx('no_names').replace('{tab}',TT[t][2]))
 }
 $('#tabs').onclick=e=>{const t=e.target.dataset.t;if(t)tab(t)};
-async function api(o){try{const r=await fetch(API,{method:'POST',body:JSON.stringify({stage:WS,code:$('#wc').value,name:$('#wn').value,...o})});return await r.json()}catch(e){return{ok:false,err:'No signal. This step needs internet.'}}}
+async function api(o){try{const r=await fetch(API,{method:'POST',body:JSON.stringify({stage:WS,code:$('#wc').value,name:$('#wn').value,...o})});return await r.json()}catch(e){return{ok:false,err:tx('nosig_step')}}}
 async function wlist(){
- if(!$('#wn').value)return wmsg('Select your name first');
- $('#wrep').innerHTML='';wmsg('Loading...');
+ if(!$('#wn').value)return wmsg(tx('sel_first'));
+ $('#wrep').innerHTML='';wmsg(tx('loading'));
  const r=await api({action:'list'});if(!r.ok){$('#wlist').innerHTML='';return wmsg(r.err)}
- wmsg(r.items.length?'':'No reports are waiting for this step.');
- $('#wlist').innerHTML=r.items.map(x=>`<div class="card item" data-id="${esc(x.id)}"><b>${esc(x.loc)} &middot; ${esc(x.date)} &middot; Shift ${esc(x.shift)}</b><div style="font-size:13px">Checked by ${esc(x.by)}${x.ver?' &middot; Verified by '+esc(x.ver):''}</div>${x.reason?'<div style="font-size:13px;color:#ffd27a">Returned'+(x.retBy?' by '+esc(x.retBy):'')+': '+esc(x.reason)+'</div>':''}<div style="font-size:12px;color:${x.flags?'#ff8a8a':'#8fe3a0'}">${x.flags?x.flags+' reading(s) out of range / abnormal':'All readings normal'}</div></div>`).join('')
+ wmsg(r.items.length?'':tx('none_wait'));
+ $('#wlist').innerHTML=r.items.map(x=>`<div class="card item" data-id="${esc(x.id)}"><b>${esc(x.loc)} &middot; ${esc(x.date)} &middot; ${tx('shift_w')}${esc(x.shift)}</b><div style="font-size:13px">${tx('checked_by')}${esc(x.by)}${x.ver?' &middot; '+tx('verified_by')+esc(x.ver):''}</div>${x.reason?'<div style="font-size:13px;color:#ffd27a">'+tx('returned')+(x.retBy?tx('ret_by').replace('{n}',esc(x.retBy)):'')+': '+esc(x.reason)+'</div>':''}<div style="font-size:12px;color:${x.flags?'#ff8a8a':'#8fe3a0'}">${x.flags?x.flags+tx('flags_n'):tx('all_normal')}</div></div>`).join('')
 }
 $('#wl').onclick=wlist;
 $('#wlist').onclick=e=>{const c=e.target.closest('.item');if(c)wopen(c.dataset.id)};
 async function wopen(id){
- wmsg('Loading report...');const r=await api({action:'get',id});if(!r.ok)return wmsg(r.err);wmsg('');
+ wmsg(tx('load_rep'));const r=await api({action:'get',id});if(!r.ok)return wmsg(r.err);wmsg('');
  const m=r.meta,g={},rem={};r.rows.forEach(x=>{if(x[1]=='Remark')rem[x[0]]=x[2];else(g[x[0]]=g[x[0]]||[]).push(x)});
  $('#wlist').innerHTML='';
- $('#wrep').innerHTML=`<div class=bar><div class=w><b style="font-size:17px">${esc(m.loc)} &middot; ${esc(m.date)} &middot; Shift ${esc(m.shift)}</b><div style="font-size:13px">Checked by ${esc(m.by)}${m.ver?' &middot; Verified by '+esc(m.ver)+' ('+esc(m.verAt)+')':''}</div></div></div>`
- +Object.entries(g).map(([e,fs])=>`<div class="card rp"><b>${esc(e)}</b><table>`+fs.map(x=>`<tr class="${x[4]?'f':''}"><td>${esc(x[1])}</td><td><b>${esc(x[2])}</b> ${esc(x[5])}</td><td>${x[3]?'OP '+esc(String(x[3]).replace(/\s*-\s*/,'-')):''}</td><td>${esc(x[4])}</td></tr>`).join('')+`</table>${rem[e]?'<div style="color:#ff8a8a;margin-top:4px"><b>Remark:</b> '+esc(rem[e])+'</div>':''}</div>`).join('')
- +(r.photos&&r.photos.length?`<div class="card rp"><b>Photos from the checker</b>`+r.photos.map(x=>`<div style="margin-top:8px">${esc(x.e)}<br><img src="${esc(x.d)}" style="max-width:100%;border-radius:4px"></div>`).join('')+'</div>':'')
- +(WS=='fix'?`<div class=bar><div class=w style="color:#ffd27a"><b>Returned${m.retBy?' by '+esc(m.retBy):''}:</b> ${esc(m.reason)}</div><button id=wback class=w style="background:#444;color:#fff">Back to list</button><button id=wfix class=w>Correct this report and resubmit</button></div>`
- :`<div class=bar><div class=w><label>Return to checker (write the reason)</label><input id=wrs maxlength=300 placeholder="e.g. Drive motor-1 R current looks wrong"></div><button id=wret class=w style="background:#7a2d2d;color:#fff">Return to checker</button><button id=wback class=w style="background:#444;color:#fff">Back to list</button><button id=wsign class=w>I have read this report - ${WS=='verify'?'Verify':'Approve'}</button></div>`);
+ $('#wrep').innerHTML=`<div class=bar><div class=w><b style="font-size:17px">${esc(m.loc)} &middot; ${esc(m.date)} &middot; ${tx('shift_w')}${esc(m.shift)}</b><div style="font-size:13px">${tx('checked_by')}${esc(m.by)}${m.ver?' &middot; '+tx('verified_by')+esc(m.ver)+' ('+esc(m.verAt)+')':''}</div></div></div>`
+ +Object.entries(g).map(([e,fs])=>`<div class="card rp"><b>${esc(e)}</b><table>`+fs.map(x=>`<tr class="${x[4]?'f':''}"><td>${esc(x[1])}</td><td><b>${esc(x[2])}</b> ${esc(x[5])}</td><td>${x[3]?'OP '+esc(String(x[3]).replace(/\s*-\s*/,'-')):''}</td><td>${esc(x[4])}</td></tr>`).join('')+`</table>${rem[e]?'<div style="color:#ff8a8a;margin-top:4px"><b>'+tx('remark_w')+'</b> '+esc(rem[e])+'</div>':''}</div>`).join('')
+ +(r.photos&&r.photos.length?`<div class="card rp"><b>${tx('photos_chk')}</b>`+r.photos.map(x=>`<div style="margin-top:8px">${esc(x.e)}<br><img src="${esc(x.d)}" style="max-width:100%;border-radius:4px"></div>`).join('')+'</div>':'')
+ +(WS=='fix'?`<div class=bar><div class=w style="color:#ffd27a"><b>${tx('returned')}${m.retBy?tx('ret_by').replace('{n}',esc(m.retBy)):''}:</b> ${esc(m.reason)}</div><button id=wback class=w style="background:#444;color:#fff">${tx('back_list')}</button><button id=wfix class=w>${tx('fix_resub')}</button></div>`
+ :`<div class=bar><div class=w><label>${tx('ret_label')}</label><input id=wrs maxlength=300 placeholder="${tx('ret_ph')}"></div><button id=wret class=w style="background:#7a2d2d;color:#fff">${tx('ret_btn')}</button><button id=wback class=w style="background:#444;color:#fff">${tx('back_list')}</button><button id=wsign class=w>${tx(WS=='verify'?'read_ver':'read_app')}</button></div>`);
  window.scrollTo(0,0);
  $('#wback').onclick=wlist;
  if(WS=='fix')$('#wfix').onclick=()=>loadFix(r);
- else $('#wret').onclick=async()=>{const rs=$('#wrs').value.trim();if(rs.length<3){window.scrollTo(0,0);return wmsg('Write the reason for returning this report')}
-  if(!confirm('Return this report to '+m.by+'?'))return;const q=await api({action:'return',id,reason:rs});if(!q.ok){window.scrollTo(0,0);return wmsg(q.err)}
-  await wlist();wmsg('Returned to '+m.by+'. They will be emailed.');window.scrollTo(0,0)};
+ else $('#wret').onclick=async()=>{const rs=$('#wrs').value.trim();if(rs.length<3){window.scrollTo(0,0);return wmsg(tx('ret_reason'))}
+  if(!confirm(tx('ret_conf').replace('{n}',m.by)))return;const q=await api({action:'return',id,reason:rs});if(!q.ok){window.scrollTo(0,0);return wmsg(q.err)}
+  await wlist();wmsg(tx('ret_done').replace('{n}',m.by));window.scrollTo(0,0)};
  if(WS!='fix')$('#wsign').onclick=async()=>{
-  const name=$('#wn').value;if(!name){window.scrollTo(0,0);return wmsg('Select your name first')}
-  if(!confirm((WS=='verify'?'Verify':'Approve')+' this report as '+name+'?'))return;
+  const name=$('#wn').value;if(!name){window.scrollTo(0,0);return wmsg(tx('sel_first'))}
+  if(!confirm(tx(WS=='verify'?'conf_ver':'conf_app').replace('{n}',name)))return;
   const s=await api({action:'sign',id});if(!s.ok){window.scrollTo(0,0);return wmsg(s.err)}
   try{LS['wn_'+WS]=name}catch(e){}
-  await wlist();wmsg('Done. Report '+(WS=='verify'?'verified':'approved')+' by '+name+'.'+(s.warn?' '+s.warn:''));window.scrollTo(0,0)
+  await wlist();wmsg(tx(WS=='verify'?'done_ver':'done_app').replace('{n}',name)+(s.warn?' '+s.warn:''));window.scrollTo(0,0)
  }
 }
 
@@ -215,7 +219,7 @@ async function wopen(id){
 function tmsg(t){const m=$('#tmsg');m.textContent=t;m.style.display=t?'block':'none'}
 function trInit(){
  const nm=[...new Set([...E.map(r=>r[0]),...VN,...AN])].sort();
- $('#tn').innerHTML='<option value="">Select your name'+nm.map(n=>`<option>${esc(n)}`).join('');
+ $('#tn').innerHTML='<option value="">'+tx('sel_yname')+nm.map(n=>`<option>${esc(n)}`).join('');
  try{const s=LS.wn_trd;if(s&&nm.includes(s))$('#tn').value=s}catch(e){}
  $('#tl').innerHTML=[...new Set(M.map(r=>r[0]))].map(l=>`<option>${esc(l)}`).join('');trEq();
  if(!$('#tm').value)$('#tm').value=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,7);
@@ -223,17 +227,17 @@ function trInit(){
 function trEq(){const l=$('#tl').value;$('#te').innerHTML=[...new Set(M.filter(r=>r[0]==l&&r[3]=='num').map(r=>r[1]))].map(e=>`<option>${esc(e)}`).join('');trF()}
 function trF(){const l=$('#tl').value,e=$('#te').value;$('#tf').innerHTML=M.filter(r=>r[0]==l&&r[1]==e&&r[3]=='num').map(r=>`<option>${esc(r[2])}`).join('')}
 $('#tl').onchange=trEq;$('#te').onchange=trF;
-async function tapi(o){if(!$('#tn').value||!$('#tc').value){tmsg('Select your name and enter your personal code');return{ok:false,silent:1}}
- tmsg('Loading...');try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify({stage:'trend',name:$('#tn').value,code:$('#tc').value,...o})})).json();if(r.ok){tmsg('');try{LS.wn_trd=$('#tn').value}catch(e){}}else tmsg(r.err);return r}catch(e){tmsg('No signal. Trends need internet.');return{ok:false,silent:1}}}
+async function tapi(o){if(!$('#tn').value||!$('#tc').value){tmsg(tx('tr_need'));return{ok:false,silent:1}}
+ tmsg(tx('loading'));try{const r=await(await fetch(API,{method:'POST',body:JSON.stringify({stage:'trend',name:$('#tn').value,code:$('#tc').value,...o})})).json();if(r.ok){tmsg('');try{LS.wn_trd=$('#tn').value}catch(e){}}else tmsg(r.err);return r}catch(e){tmsg(tx('tr_nosig'));return{ok:false,silent:1}}}
 $('#ts').onclick=async()=>{const r=await tapi({action:'series',loc:$('#tl').value,equip:$('#te').value,field:$('#tf').value});if(r.ok)drawLine(r,$('#te').value+' · '+$('#tf').value,$('#tl').value)};
 $('#tg').onclick=async()=>{const r=await tapi({action:'flags',loc:$('#tl').value,month:$('#tm').value});if(r.ok)drawBars(r,$('#tl').value)};
 const NS='http://www.w3.org/2000/svg',el=(n,a,t)=>{const x=document.createElementNS(NS,n);for(const k in a)x.setAttribute(k,a[k]);if(t!=null)x.textContent=t;return x};
 function card(title,sub){const c=document.createElement('div');c.className='viz';const h=document.createElement('h3');h.textContent=title;const u=document.createElement('div');u.className='sub';u.textContent=sub;const tip=document.createElement('div');tip.className='tip';c.append(h,u);return{c,tip}}
-function table(c,head,rows){const d=document.createElement('details'),sm=document.createElement('summary');sm.textContent='Table view';const t=document.createElement('table'),hr=t.insertRow();head.forEach(x=>{const th=document.createElement('th');th.textContent=x;hr.append(th)});rows.forEach(r=>{const tr=t.insertRow();r.forEach((x,i)=>{const td=tr.insertCell();td.textContent=x;if(i==r.length-1&&x&&head[i]=='Status')td.className='b'})});d.append(sm,t);c.append(d)}
+function table(c,head,rows){const d=document.createElement('details'),sm=document.createElement('summary');sm.textContent=tx('tbl_view');const t=document.createElement('table'),hr=t.insertRow();head.forEach(x=>{const th=document.createElement('th');th.textContent=x;hr.append(th)});rows.forEach(r=>{const tr=t.insertRow();r.forEach((x,i)=>{const td=tr.insertCell();td.textContent=x;if(i==r.length-1&&x&&head.length==4)td.className='b'})});d.append(sm,t);c.append(d)}
 function nice(mn,mx,n){const raw=(mx-mn)/n,p=Math.pow(10,Math.floor(Math.log10(raw))),f=raw/p,st=(f<=1?1:f<=2?2:f<=5?5:10)*p;return{a:Math.floor(mn/st+1e-9)*st,b:Math.ceil(mx/st-1e-9)*st,st}} // round axis ticks (1, 2, 5 x 10^k)
 function drawLine(r,title,loc){
  const out=$('#tout');out.textContent='';const P=r.points,rg=rng(r.range),lo=rg?rg[0]:null,hi=rg?rg[1]:null,u=r.unit?' '+r.unit:'';
- const {c,tip}=card(title+' ('+loc+')',P.length?'Last '+P.length+' checklists, oldest to newest'+(rg?' · shaded band = operating range '+String(r.range).replace(/\s*-\s*/,'–'):''):'No readings yet');
+ const {c,tip}=card(title+' ('+loc+')',P.length?tx('tr_sub').replace('{n}',P.length)+(rg?tx('tr_band')+String(r.range).replace(/\s*-\s*/,'–'):''):tx('tr_none'));
  out.append(c);if(!P.length)return;
  const W=Math.max(300,out.clientWidth-40),Ht=240,L=44,R=16,Tp=14,B=34,vals=P.map(x=>+x[2]);
  let mn=Math.min(...vals,lo!=null&&isFinite(lo)?lo:Infinity),mx=Math.max(...vals,hi!=null?hi:-Infinity);if(mn==mx){mn-=1;mx+=1}const nz=nice(mn,mx,4);mn=nz.a;mx=nz.b;
@@ -249,34 +253,36 @@ function drawLine(r,title,loc){
  const lv=vals[vals.length-1],lx=X(P.length-1);svg.append(el('text',{x:Math.min(lx,W-R),y:Y(lv)-10,'text-anchor':'end',class:'v'},f(lv)+u));
  const cr=el('line',{y1:Tp,y2:Ht-B,stroke:'var(--mu)','stroke-width':1,visibility:'hidden'}),hit=el('rect',{x:L,y:0,width:W-L,height:Ht,fill:'transparent'});svg.append(cr,hit);c.append(svg,tip);
  const show=ev=>{const bx=svg.getBoundingClientRect(),px=(ev.clientX-bx.left)*W/bx.width;let i=Math.round((px-L)/((W-L-R)/Math.max(1,P.length-1)));i=Math.max(0,Math.min(P.length-1,i));
-  cr.setAttribute('x1',X(i));cr.setAttribute('x2',X(i));cr.setAttribute('visibility','visible');const v=+P[i][2];tip.textContent='';const b1=document.createElement('b'),k=document.createElement('i');b1.textContent=f(v)+u;tip.append(k,b1,document.createElement('br'),document.createTextNode(P[i][0]+' · Shift '+P[i][1]+(bad(v)?' · '+(v>hi?'HIGH':'LOW'):'')));
+  cr.setAttribute('x1',X(i));cr.setAttribute('x2',X(i));cr.setAttribute('visibility','visible');const v=+P[i][2];tip.textContent='';const b1=document.createElement('b'),k=document.createElement('i');b1.textContent=f(v)+u;tip.append(k,b1,document.createElement('br'),document.createTextNode(P[i][0]+' · '+tx('shift_w')+P[i][1]+(bad(v)?' · '+(v>hi?'HIGH':'LOW'):'')));
   tip.style.display='block';const cb=c.getBoundingClientRect();tip.style.left=Math.max(4,Math.min(cb.width-tip.offsetWidth-4,ev.clientX-cb.left-tip.offsetWidth/2))+'px';tip.style.top=Math.max(40,ev.clientY-cb.top-tip.offsetHeight-14)+'px'};
  hit.addEventListener('pointermove',show);hit.addEventListener('pointerdown',show);hit.addEventListener('pointerleave',()=>{cr.setAttribute('visibility','hidden');tip.style.display='none'});
- table(c,['Date','Shift','Value','Status'],P.slice().reverse().map(x=>[x[0],x[1],x[2]+u,bad(+x[2])?(+x[2]>hi?'HIGH':'LOW'):'']));
+ table(c,[tx('th_date'),tx('th_shift'),tx('th_value'),tx('th_status')],P.slice().reverse().map(x=>[x[0],x[1],x[2]+u,bad(+x[2])?(+x[2]>hi?'HIGH':'LOW'):'']));
 }
 function drawBars(r,loc){
  const out=$('#tout');out.textContent='';const T=r.top;
- const {c,tip}=card('Most flagged items · '+(loc||'all locations'),r.month+' · '+r.subs+' checklist'+(r.subs==1?'':'s')+' submitted'+(T.length?'':' · nothing was flagged'));out.append(c);if(!T.length)return;
+ const {c,tip}=card(tx('mf_title')+(loc||tx('mf_all')),r.month+' · '+r.subs+tx(r.subs==1?'mf_sub1':'mf_sub')+(T.length?'':tx('mf_nothing')));out.append(c);if(!T.length)return;
  const W=Math.max(300,out.clientWidth-40),RH=40,Ht=T.length*RH+4,mx=T[0][1],bw=W-48,svg=el('svg',{viewBox:`0 0 ${W} ${Ht}`,role:'img','aria-label':'Most flagged items'});
  T.forEach(([k,n],i)=>{const y=i*RH,w=Math.max(4,n/mx*bw),rr=4;
   svg.append(el('text',{x:0,y:y+13,class:'l'},k.length>52?k.slice(0,51)+'…':k));
   const g=el('path',{d:`M0,${y+19} H${w-rr} a${rr},${rr} 0 0 1 ${rr},${rr} v${14-2*rr} a${rr},${rr} 0 0 1 -${rr},${rr} H0 Z`,fill:'var(--c1)',tabindex:0,'aria-label':k+': '+n});
   const hit=el('rect',{x:0,y:y,width:W,height:RH,fill:'transparent'});svg.append(g,el('text',{x:w+6,y:y+31,class:'v'},n));svg.append(hit);
-  const sh=ev=>{tip.textContent='';const b=document.createElement('b');b.textContent=n+(n==1?' time':' times');tip.append(b,document.createElement('br'),document.createTextNode(k));tip.style.display='block';const cb=c.getBoundingClientRect();tip.style.left=Math.max(4,Math.min(cb.width-tip.offsetWidth-4,ev.clientX-cb.left-tip.offsetWidth/2))+'px';tip.style.top=Math.max(40,ev.clientY-cb.top-tip.offsetHeight-14)+'px';g.setAttribute('fill-opacity',.8)};
+  const sh=ev=>{tip.textContent='';const b=document.createElement('b');b.textContent=n+tx(n==1?'time1':'timeN');tip.append(b,document.createElement('br'),document.createTextNode(k));tip.style.display='block';const cb=c.getBoundingClientRect();tip.style.left=Math.max(4,Math.min(cb.width-tip.offsetWidth-4,ev.clientX-cb.left-tip.offsetWidth/2))+'px';tip.style.top=Math.max(40,ev.clientY-cb.top-tip.offsetHeight-14)+'px';g.setAttribute('fill-opacity',.8)};
   hit.addEventListener('pointermove',sh);hit.addEventListener('pointerdown',sh);hit.addEventListener('pointerleave',()=>{tip.style.display='none';g.setAttribute('fill-opacity',1)})});
- c.append(svg,tip);table(c,['Item','Times flagged'],T.map(([k,n])=>[k,n]));
+ c.append(svg,tip);table(c,[tx('th_item'),tx('th_times')],T.map(([k,n])=>[k,n]));
 }
 // ---- phone details: pull down to refresh, back button, keyboard
 let py=null;
 document.addEventListener('touchstart',e=>{py=window.scrollY<=0&&$('#chk').style.display!='none'?e.touches[0].clientY:null},{passive:true});
-document.addEventListener('touchend',e=>{if(py!==null&&e.changedTouches[0].clientY-py>120){$('#st').textContent='Refreshing...';loadData(true)}py=null},{passive:true});
+document.addEventListener('touchend',e=>{if(py!==null&&e.changedTouches[0].clientY-py>120){$('#st').textContent=tx('refreshing');loadData(true)}py=null},{passive:true});
 history.pushState({llf:1},'');
 addEventListener('popstate',()=>{ // Android back button: first closes an open report or goes back to the checklist; leaving a half-filled checklist asks first
  if($('#chk').style.display=='none'){if($('#wback'))$('#wback').click();else tab('chk');history.pushState({llf:1},'');return}
- if(Object.keys(D.v).length&&!confirm('This checklist is not submitted yet. Your draft is saved on this phone.\n\nLeave the app?')){history.pushState({llf:1},'');return}
+ if(Object.keys(D.v).length&&!confirm(tx('leave'))){history.pushState({llf:1},'');return}
  history.back();
 });
 document.addEventListener('focusin',e=>{const t=e.target;if(t.matches&&t.matches('input,select,textarea'))setTimeout(()=>{try{t.scrollIntoView({block:'center',behavior:'smooth'})}catch(x){}},300)}); // keeps the box you are typing in above the keyboard
+applyLang();
+$('#lg').onclick=()=>{if(M.length)save();LANG=LANG=='or'?'en':'or';try{LS.lang=LANG}catch(e){}applyLang();$('#st').textContent='';if(M.length)init();const on=document.querySelector('#tabs button.on');if(on&&on.dataset.t!='chk')tab(on.dataset.t)};
 addEventListener('online',sync);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
 </script></body></html>
