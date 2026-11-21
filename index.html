@@ -217,6 +217,7 @@ async function wopen(id){
   const sb=$('#wsign');sb.disabled=true;
   const s=await api({action:'sign',id});if(!s.ok){sb.disabled=false;window.scrollTo(0,0);return wmsg(s.err)}
   try{LS['wn_'+WS]=name}catch(e){}
+  fetch(API,{method:'POST',body:JSON.stringify({action:'pdfq'}),keepalive:true}).catch(()=>{}); // rebuilds the signed PDF in Drive in the background; nobody waits for it
   await wlist();wmsg(tx(WS=='verify'?'done_ver':'done_app').replace('{n}',name)+(s.warn?' '+s.warn:''));window.scrollTo(0,0)
  }
 }
