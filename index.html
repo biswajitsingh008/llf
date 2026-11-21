@@ -216,10 +216,10 @@ async function wopen(id){
  if(WS!='fix')$('#wsign').onclick=async()=>{
   const name=$('#wn').value;if(!name){window.scrollTo(0,0);return wmsg(tx('sel_first'))}
   const sb=$('#wsign');sb.disabled=true;
-  const T1=Date.now();const s=await api({action:'sign',id});if(!s.ok){sb.disabled=false;window.scrollTo(0,0);return wmsg(s.err)}
+  const s=await api({action:'sign',id});if(!s.ok){sb.disabled=false;window.scrollTo(0,0);return wmsg(s.err)}
   try{LS['wn_'+WS]=name}catch(e){}
   fetch(API,{method:'POST',body:JSON.stringify({action:'pdfq'}),keepalive:true}).catch(()=>{}); // rebuilds the signed PDF in Drive in the background; nobody waits for it
-  doneItem(id);wmsg(tx(WS=='verify'?'done_ver':'done_app').replace('{n}',name)+(s.warn?' '+s.warn:'')+(s.t?' ['+s.t.v+' lock '+s.t.lock+'ms, server '+s.t.srv+'ms, total '+(Date.now()-T1)+'ms]':' [old server code]'));window.scrollTo(0,0) // no second round trip: the finished report is simply taken off the list
+  doneItem(id);wmsg(tx(WS=='verify'?'done_ver':'done_app').replace('{n}',name)+(s.warn?' '+s.warn:''));window.scrollTo(0,0) // no second round trip: the finished report is simply taken off the list
  }
 }
 
