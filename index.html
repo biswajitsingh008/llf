@@ -188,6 +188,7 @@ function tab(t){
 }
 $('#tabs').onclick=e=>{const t=e.target.dataset.t;if(t)tab(t)};
 async function api(o){try{const r=await fetch(API,{method:'POST',body:JSON.stringify({stage:WS,code:$('#wc').value,name:$('#wn').value,...o})});return await r.json()}catch(e){return{ok:false,err:tx('nosig_step')}}}
+function doneItem(id){$('#wrep').innerHTML='';[...document.querySelectorAll('#wlist .item')].forEach(c=>{if(c.dataset.id==id)c.remove()});if(!document.querySelector('#wlist .item'))$('#wlist').innerHTML=''}
 async function wlist(){
  if(!$('#wn').value)return wmsg(tx('sel_first'));
  $('#wrep').innerHTML='';wmsg(tx('loading'));
@@ -211,14 +212,14 @@ async function wopen(id){
  if(WS=='fix')$('#wfix').onclick=()=>loadFix(r);
  else $('#wret').onclick=async()=>{const rs=$('#wrs').value.trim();if(rs.length<3){window.scrollTo(0,0);return wmsg(tx('ret_reason'))}
   if(!confirm(tx('ret_conf').replace('{n}',m.by)))return;const q=await api({action:'return',id,reason:rs});if(!q.ok){window.scrollTo(0,0);return wmsg(q.err)}
-  await wlist();wmsg(tx('ret_done').replace('{n}',m.by));window.scrollTo(0,0)};
+  doneItem(id);wmsg(tx('ret_done').replace('{n}',m.by));window.scrollTo(0,0)};
  if(WS!='fix')$('#wsign').onclick=async()=>{
   const name=$('#wn').value;if(!name){window.scrollTo(0,0);return wmsg(tx('sel_first'))}
   const sb=$('#wsign');sb.disabled=true;
   const s=await api({action:'sign',id});if(!s.ok){sb.disabled=false;window.scrollTo(0,0);return wmsg(s.err)}
   try{LS['wn_'+WS]=name}catch(e){}
   fetch(API,{method:'POST',body:JSON.stringify({action:'pdfq'}),keepalive:true}).catch(()=>{}); // rebuilds the signed PDF in Drive in the background; nobody waits for it
-  await wlist();wmsg(tx(WS=='verify'?'done_ver':'done_app').replace('{n}',name)+(s.warn?' '+s.warn:''));window.scrollTo(0,0)
+  doneItem(id);wmsg(tx(WS=='verify'?'done_ver':'done_app').replace('{n}',name)+(s.warn?' '+s.warn:''));window.scrollTo(0,0) // no second round trip: the finished report is simply taken off the list
  }
 }
 
